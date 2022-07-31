@@ -20,10 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{F40E5C94-4BFE-4358-AA83-175A6FF16BD4}</ProjectGuid>
-    <RootNamespace>Template2D</RootNamespace>
+    <ProjectGuid>{C67719F7-0DF0-4C14-8A02-EBF36FC4C988}</ProjectGuid>
+    <RootNamespace>Beaker</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>DVDLogo</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -70,12 +69,17 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)</IntDir>
@@ -85,12 +89,27 @@
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)</OutDir>
-    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)</IntDir>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\OpenGL\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AddModuleNamesToAssembly>libpng16-16.dll;SDL2.dll;SDL2_image.dll;zlib1.dll;%(AddModuleNamesToAssembly)</AddModuleNamesToAssembly>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
@@ -106,7 +125,7 @@
       <AddModuleNamesToAssembly>libpng16-16.dll;SDL2.dll;SDL2_image.dll;zlib1.dll;%(AddModuleNamesToAssembly)</AddModuleNamesToAssembly>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
@@ -142,42 +161,38 @@
       <AddModuleNamesToAssembly>libpng16-16.dll;SDL2.dll;SDL2_image.dll;zlib1.dll;%(AddModuleNamesToAssembly)</AddModuleNamesToAssembly>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\OpenGL\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AddModuleNamesToAssembly>libpng16-16.dll;SDL2.dll;SDL2_image.dll;zlib1.dll;%(AddModuleNamesToAssembly)</AddModuleNamesToAssembly>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\DVDLogo.cpp" />
-    <ClCompile Include="src\SpriteComponent.cpp" />
-    <ClCompile Include="src\Math.cpp" />
-    <ClCompile Include="src\Component.cpp" />
+    <ClCompile Include="src\CircleRigidbodyComponent.cpp" />
+    <ClCompile Include="src\CircleCollisionComponent.cpp" />
+    <ClCompile Include="src\Random.cpp" />
+    <ClCompile Include="src\Ball2D.cpp" />
+    <ClCompile Include="src\MoveConstantComponent.cpp" />
     <ClCompile Include="src\Actor.cpp" />
+    <ClCompile Include="src\Component.cpp" />
+    <ClCompile Include="src\DVDLogo.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Math.cpp" />
+    <ClCompile Include="src\SpriteComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\DVDLogo.h" />
-    <ClInclude Include="src\SpriteComponent.h" />
-    <ClInclude Include="src\Math.h" />
-    <ClInclude Include="src\Component.h" />
+    <ClInclude Include="src\CircleRigidbodyComponent.h" />
+    <ClInclude Include="src\CircleCollisionComponent.h" />
+    <ClInclude Include="src\Random.h" />
+    <ClInclude Include="src\Ball2D.h" />
+    <ClInclude Include="src\MoveConstantComponent.h" />
     <ClInclude Include="src\Actor.h" />
+    <ClInclude Include="src\Component.h" />
+    <ClInclude Include="src\DVDLogo.h" />
     <ClInclude Include="src\Game.h" />
+    <ClInclude Include="src\Math.h" />
+    <ClInclude Include="src\SpriteComponent.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="libpng16-16.dll" />
+    <None Include="SDL2.dll" />
+    <None Include="SDL2_image.dll" />
+    <None Include="zlib1.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

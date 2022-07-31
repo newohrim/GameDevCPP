@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameDevCPP", "GameDevCPP\GameDevCPP.vcxproj", "{8CB5DB32-CB6E-4025-8804-5101CFB99A8A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pong", "GameDevCPP\GameDevCPP.vcxproj", "{8CB5DB32-CB6E-4025-8804-5101CFB99A8A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Template2D", "Template2D\Template2D.vcxproj", "{F40E5C94-4BFE-4358-AA83-175A6FF16BD4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DVDLogo", "Template2D\Template2D.vcxproj", "{F40E5C94-4BFE-4358-AA83-175A6FF16BD4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Beaker", "Beaker\Beaker.vcxproj", "{C67719F7-0DF0-4C14-8A02-EBF36FC4C988}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{F40E5C94-4BFE-4358-AA83-175A6FF16BD4}.Release|x64.Build.0 = Release|x64
 		{F40E5C94-4BFE-4358-AA83-175A6FF16BD4}.Release|x86.ActiveCfg = Release|Win32
 		{F40E5C94-4BFE-4358-AA83-175A6FF16BD4}.Release|x86.Build.0 = Release|Win32
+		{C67719F7-0DF0-4C14-8A02-EBF36FC4C988}.Debug|x64.ActiveCfg = Debug|x64
+		{C67719F7-0DF0-4C14-8A02-EBF36FC4C988}.Debug|x64.Build.0 = Debug|x64
+		{C67719F7-0DF0-4C14-8A02-EBF36FC4C988}.Debug|x86.ActiveCfg = Debug|Win32
+		{C67719F7-0DF0-4C14-8A02-EBF36FC4C988}.Debug|x86.Build.0 = Debug|Win32
+		{C67719F7-0DF0-4C14-8A02-EBF36FC4C988}.Release|x64.ActiveCfg = Release|x64
+		{C67719F7-0DF0-4C14-8A02-EBF36FC4C988}.Release|x64.Build.0 = Release|x64
+		{C67719F7-0DF0-4C14-8A02-EBF36FC4C988}.Release|x86.ActiveCfg = Release|Win32
+		{C67719F7-0DF0-4C14-8A02-EBF36FC4C988}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
