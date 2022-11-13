@@ -9,12 +9,11 @@
 #pragma once
 #include "Component.h"
 #include "SDL/SDL.h"
-
 class SpriteComponent : public Component
 {
 public:
 	// (Lower draw order corresponds with further back)
-	SpriteComponent(class Actor* owner, int drawOrder = 100);
+	SpriteComponent(class Actor* owner, int drawOrder = 150);
 	~SpriteComponent();
 
 	virtual void Draw(SDL_Renderer* renderer);
