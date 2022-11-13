@@ -27,6 +27,8 @@ SpriteComponent::~SpriteComponent()
 
 void SpriteComponent::Draw(SDL_Renderer* renderer)
 {
+	if (!m_IsVisible) return;
+
 	if (mTexture)
 	{
 		SDL_Rect r;
@@ -37,6 +39,11 @@ void SpriteComponent::Draw(SDL_Renderer* renderer)
 		r.x = static_cast<int>(mOwner->GetPosition().x - r.w / 2);
 		r.y = static_cast<int>(mOwner->GetPosition().y - r.h / 2);
 
+		SDL_SetTextureBlendMode(mTexture, SDL_BLENDMODE_BLEND);
+		SDL_SetTextureAlphaMod(mTexture, (uint8_t)(m_AlphaModifier * 255));
+		SDL_SetTextureColorMod(
+			mTexture, m_ColorModifier.r, m_ColorModifier.g, m_ColorModifier.b);
+
 		// Draw (have to convert angle from radians to degrees, and clockwise to counter)
 		SDL_RenderCopyEx(renderer,
 			mTexture,
@@ -45,6 +52,10 @@ void SpriteComponent::Draw(SDL_Renderer* renderer)
 			-Math::ToDegrees(mOwner->GetRotation()),
 			nullptr,
 			SDL_FLIP_NONE);
+
+		SDL_SetTextureAlphaMod(mTexture, 255);
+		SDL_SetTextureBlendMode(mTexture, SDL_BLENDMODE_NONE);
+		SDL_SetTextureColorMod(mTexture, 255, 255, 255);
 	}
 }
 

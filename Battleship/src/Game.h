@@ -13,6 +13,7 @@ struct SDL_Texture;
 
 class Ball2D;
 class GameBoard;
+class PlaceableBattleshipButton;
 
 class Game
 {
@@ -55,9 +56,10 @@ private:
 	uint32_t mTicksCount = 0;
 	bool mUpdatingActors = false;
 
-	GameBoard* m_GameBoard = nullptr;
-	std::vector<Battleship*> Ships;
-	std::vector<BattleshipStats> ShipTamplates;
+	GameBoard* m_GameBoard_Player = nullptr;
+	GameBoard* m_GameBoard_Opponent = nullptr;
+	std::vector<BattleshipStats> m_ShipTamplates;
+	std::vector<PlaceableBattleshipButton*> m_ShipsButtons;
 
 	bool m_RedrawRequested = true;
 	
@@ -67,5 +69,9 @@ private:
 		"Assets/greenball.png" 
 	};
 	std::vector<Ball2D*> Balls;
+
+	void OnMouseOverHandle(const int Mouse_X, const int Mouse_Y);
+
+	void OnMouseDownHandle(const int Mouse_X, const int Mouse_Y);
 };
 

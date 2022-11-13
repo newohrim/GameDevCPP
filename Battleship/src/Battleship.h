@@ -15,6 +15,7 @@ struct BattleshipStats
 {
 	SDL_Texture* m_ShipTexture = nullptr;
 	uint8_t m_ShipLength = 1;
+	uint8_t m_ShipsBeginCount = 1;
 };
 
 class Battleship : public Actor
@@ -25,6 +26,8 @@ public:
 
 	BattleshipStats const* GetShipStats() const { return m_ShipStats; }
 	ShipOritentation GetShipOrientation() const { return m_ShipOrientation; }
+
+	SpriteComponent* GetSpriteComponent() const { return m_SpriteComponent; }
 
 protected:
 	BattleshipStats const* const m_ShipStats;

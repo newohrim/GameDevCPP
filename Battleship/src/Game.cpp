@@ -10,6 +10,8 @@
 #include "gameboard/GameBoard.h"
 #include "gameboard/GameBoardDrawer.h"
 #include "gameboard/GameBoardPopulator.h"
+#include "PlaceableBattleshipButton.h"
+#include "RectangleClickZone.h"
 
 #include <iostream>
 
@@ -180,17 +182,30 @@ void Game::ProcessInput()
 	SDL_GetMouseState(&Mouse_X, &Mouse_Y);
 	
 	// Update highlighted cell
-	GameBoardDrawer* BoardDrawer = m_GameBoard->GetBoardDrawer();
-	const CellCoord MouseOnBoardCoord = BoardDrawer->
-		GetWorldToBoardPos(m_GameBoard, Vector2(Mouse_X, Mouse_Y), 50.0f);
-	if (m_GameBoard->IsValidCoords(MouseOnBoardCoord)) 
+	GameBoardDrawer* BoardDrawer = m_GameBoard_Opponent->GetBoardDrawer();
+	const CellCoord MouseOnBoardCoord_Opponent = BoardDrawer->
+		GetWorldToBoardPos(m_GameBoard_Opponent, Vector2(Mouse_X, Mouse_Y), 50.0f);
+	if (m_GameBoard_Opponent->IsValidCoords(MouseOnBoardCoord_Opponent)) 
 	{
-		BoardCell& Cell = m_GameBoard->GetCell(MouseOnBoardCoord);
+		BoardCell& Cell = m_GameBoard_Opponent->GetCell(MouseOnBoardCoord_Opponent);
 		if (BoardDrawer->GetCurrMouseOverCell() != &Cell) {
 			BoardDrawer->SetCurrMouseOverCell(&Cell);
 			RequestRedraw();
 		}
 	}
+	BoardDrawer = m_GameBoard_Player->GetBoardDrawer();
+	const CellCoord MouseOnBoardCoord_Player = BoardDrawer->
+		GetWorldToBoardPos(m_GameBoard_Player, Vector2(Mouse_X, Mouse_Y), 50.0f);
+	if (m_GameBoard_Opponent->IsValidCoords(MouseOnBoardCoord_Player))
+	{
+		BoardCell& Cell = m_GameBoard_Player->GetCell(MouseOnBoardCoord_Player);
+		if (BoardDrawer->GetCurrMouseOverCell() != &Cell) {
+			BoardDrawer->SetCurrMouseOverCell(&Cell);
+			RequestRedraw();
+		}
+	}
+
+	OnMouseOverHandle(Mouse_X, Mouse_Y);
 
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) 
@@ -199,6 +214,9 @@ void Game::ProcessInput()
 		{
 			case SDL_QUIT:
 				mIsRunning = false;
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				OnMouseDownHandle(Mouse_X, Mouse_Y);
 				break;
 		}
 	}
@@ -268,7 +286,13 @@ void Game::GenerateOutput()
 		);
 		SDL_RenderClear(mRenderer);
 
-		m_GameBoard->GetBoardDrawer()->DrawBoard(m_GameBoard, mRenderer, 50.0f);
+		//m_GameBoard_Opponent->GetBoardDrawer()->DrawBoard(m_GameBoard_Opponent, mRenderer, 50.0f);
+		const std::vector<Battleship*>& Ships_Opponent = m_GameBoard_Opponent->GetShipsOnBoard();
+		for (Battleship* Ship : Ships_Opponent) 
+		{
+			Ship->GetSpriteComponent()->SetIsVisible(false);
+		}
+		m_GameBoard_Player->GetBoardDrawer()->DrawBoard(m_GameBoard_Player, mRenderer, 50.0f);
 
 		for (SpriteComponent* sprite : mSprites)
 		{
@@ -283,22 +307,33 @@ void Game::GenerateOutput()
 
 void Game::LoadData()
 {
-	ShipTamplates = 
+	m_ShipTamplates = 
 	{
-		{ GetTexture("Assets/ships/carrier.png"), 5 },
-		{ GetTexture("Assets/ships/battleship.png"), 4 },
-		{ GetTexture("Assets/ships/cruiser.png"), 3 },
-		{ GetTexture("Assets/ships/submarine.png"), 3 },
-		{ GetTexture("Assets/ships/destroyer.png"), 2 }
+		{ GetTexture("Assets/ships/carrier.png"), 5, 1 },
+		{ GetTexture("Assets/ships/battleship.png"), 4, 2 },
+		{ GetTexture("Assets/ships/cruiser.png"), 3, 2 },
+		{ GetTexture("Assets/ships/submarine.png"), 3, 3 },
+		{ GetTexture("Assets/ships/destroyer.png"), 2, 3 }
 	};
 	std::vector<BattleshipStats*> ShipsToSpawn;
-	ShipsToSpawn.insert(ShipsToSpawn.end(), 1, &ShipTamplates[0]);
-	ShipsToSpawn.insert(ShipsToSpawn.end(), 2, &ShipTamplates[1]);
-	ShipsToSpawn.insert(ShipsToSpawn.end(), 2, &ShipTamplates[2]);
-	ShipsToSpawn.insert(ShipsToSpawn.end(), 3, &ShipTamplates[3]);
-	ShipsToSpawn.insert(ShipsToSpawn.end(), 3, &ShipTamplates[4]);
-	m_GameBoard = new GameBoard(10, 10);
-	m_GameBoard->GetBoardPopulator()->PopulateGameBoard(m_GameBoard, ShipsToSpawn, this, 50.0f);
+	constexpr float PlaceableShipsPanel_X = 50.0f * 12.5f;
+	float PlaceableShipsPanel_Y = 0.0f;
+	for (BattleshipStats& ShipTamplate : m_ShipTamplates) 
+	{
+		ShipsToSpawn.insert(
+			ShipsToSpawn.end(), ShipTamplate.m_ShipsBeginCount, &ShipTamplate);
+		m_ShipsButtons.push_back(
+			new PlaceableBattleshipButton(ShipTamplate, ShipTamplate.m_ShipsBeginCount, this));
+		PlaceableShipsPanel_Y += 50.0f;
+		m_ShipsButtons.back()->SetPosition(
+			Vector2{ PlaceableShipsPanel_X, PlaceableShipsPanel_Y });
+		m_ShipsButtons.back()->SetRotation(Math::Pi / 2.0f);
+	}
+	m_GameBoard_Opponent = new GameBoard(10, 10);
+	m_GameBoard_Opponent->GetBoardPopulator()->
+		PopulateGameBoard(m_GameBoard_Opponent, ShipsToSpawn, this, 50.0f);
+
+	m_GameBoard_Player = new GameBoard(10, 10);
 
 	/*
 	const int BallsNum = Random::GetIntRange(10, 100);
@@ -316,7 +351,8 @@ void Game::LoadData()
 
 void Game::UnloadData()
 {
-	delete m_GameBoard;
+	delete m_GameBoard_Player;
+	delete m_GameBoard_Opponent;
 
 	// Delete actors
 	// Because ~Actor calls RemoveActor, have to use a different style loop
@@ -386,4 +422,39 @@ Ball2D* Game::CreateBall()
 	));
 
 	return Ball;
+}
+
+void Game::OnMouseOverHandle(const int Mouse_X, const int Mouse_Y)
+{
+	for (PlaceableBattleshipButton* ShipButton : m_ShipsButtons)
+	{
+		if (ShipButton->GetRectangleClickZone()->IsPointInsideRect(Vector2(Mouse_X, Mouse_Y)))
+		{
+			ShipButton->GetSpriteComponent()->SetAlphaModifier(0.5f);
+			ShipButton->GetRectangleClickZone()->SetIsMouseOver(true);
+			RequestRedraw();
+			break;
+		}
+		else if (ShipButton->GetRectangleClickZone()->GetIsMouseOver())
+		{
+			ShipButton->GetSpriteComponent()->SetAlphaModifier(1.0f);
+			ShipButton->GetRectangleClickZone()->SetIsMouseOver(false);
+			RequestRedraw();
+		}
+	}
+}
+
+void Game::OnMouseDownHandle(const int Mouse_X, const int Mouse_Y)
+{
+	for (PlaceableBattleshipButton* ShipButton : m_ShipsButtons) 
+	{
+		if (ShipButton->GetRectangleClickZone()->IsPointInsideRect(Vector2(Mouse_X, Mouse_Y))) 
+		{
+			ShipButton->DecrementShipsCount();
+			// Highlight selected ship button
+			ShipButton->GetSpriteComponent()->SetColorModifier({255, 255, 0, 255});
+			RequestRedraw();
+			break;
+		}
+	}
 }

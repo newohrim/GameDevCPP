@@ -162,6 +162,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\RectangleClickZone.cpp" />
+    <ClCompile Include="src\PlaceableBattleshipButton.cpp" />
     <ClCompile Include="src\gameboard\SimpleGBD.cpp" />
     <ClCompile Include="src\gameboard\SimpleGBP.cpp" />
     <ClCompile Include="src\Battleship.cpp" />
@@ -180,6 +182,8 @@
     <ClCompile Include="src\SpriteComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\RectangleClickZone.h" />
+    <ClInclude Include="src\PlaceableBattleshipButton.h" />
     <ClInclude Include="src\gameboard\GameBoardDrawer.h" />
     <ClInclude Include="src\gameboard\SimpleGBD.h" />
     <ClInclude Include="src\gameboard\GameBoardPopulator.h" />

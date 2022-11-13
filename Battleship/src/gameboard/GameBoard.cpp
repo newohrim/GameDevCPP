@@ -31,6 +31,7 @@ bool GameBoard::AddShip(Battleship* Ship, const CellCoord Pos)
 		return false;
 	}
 
+	m_Ships.push_back(Ship);
 	InsertShip(Ship, Pos);
 	return true;
 }

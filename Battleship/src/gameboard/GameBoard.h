@@ -110,6 +110,8 @@ public:
 
 	GameBoardDrawer* GetBoardDrawer() const { return BoardDrawer; }
 
+	const std::vector<Battleship*>& GetShipsOnBoard() const { return m_Ships; }
+
 protected:
 	GameBoardPopulator* BoardPopulator;
 
@@ -117,6 +119,8 @@ protected:
 
 private:
 	BoardGrid m_Grid;
+
+	std::vector<Battleship*> m_Ships;
 
 	BoardCell& GetCell_Private(const CellCoord Coords) { return m_Grid[Coords.y][Coords.x]; }
 
