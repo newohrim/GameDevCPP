@@ -24,9 +24,17 @@ public:
 
 	virtual void SetDrawVisablity(bool IsVisible, GameBoard* Board) { m_IsVisible = IsVisible; }
 
+	virtual void SetShipsVisability(bool IsVisible, GameBoard* Board) = 0;
+
+	Vector2 GetBoardPosition() const { return m_BoardPosition; }
+
+	virtual void SetBoardPosition(Vector2 Position, GameBoard* Board, const float CellSize = 100.0f) { m_BoardPosition = Position; }
+
 private:
 	BoardCell* m_CurrMouseOverCell = nullptr;
 
 	bool m_IsVisible = true;
+
+	Vector2 m_BoardPosition;
 };
 

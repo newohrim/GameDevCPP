@@ -19,21 +19,17 @@ void SimpleGBP::PopulateGameBoard(
 				Random::GetIntRange(0, GB->GetBoardWidth() - 1);
 			const uint8_t y =
 				Random::GetIntRange(0, GB->GetBoardHeight() - 1);
-			const ShipOritentation Orientation = 
+			const ShipOrientation Orientation = 
 				Random::GetIntRange(0, 1) == 0 ? 
-				ShipOritentation::Horizontal : ShipOritentation::Vertical;
-			if (GB->IsAvailableForShip(CellCoord{ x, y }, ShipStat, Orientation)) 
+				ShipOrientation::Horizontal : ShipOrientation::Vertical;
+			if (GB->IsAvailableForShip(CellCoord{ x, y }, ShipStat, &Orientation)) 
 			{
-				Battleship* Ship = new Battleship(ShipStat, Orientation, GameInstance);
+				Battleship* Ship = new Battleship(ShipStat, Orientation, CellCoord{ x, y }, GameInstance);
 				int TexWidth, TexHeight;
 				SDL_QueryTexture(ShipStat->m_ShipTexture, nullptr, nullptr, &TexWidth, &TexHeight);
-				Ship->SetPosition(Vector2
-				{ 
-					// H_x = x * 100 - TexWidth / 2 + length * 100 / 2.0
-					(float)(x * CellSize + CellHalfSize * Orientation + (ShipStat->m_ShipLength * CellSize / 2.0f) * !Orientation),
-					(float)(y * CellSize + CellHalfSize * !Orientation + (ShipStat->m_ShipLength * CellSize / 2.0f) * Orientation)
-				});
-				Ship->SetRotation(!Orientation * M_PI / 2);
+				
+				Ship->SetPosition(GB->GetCorrectShipPosition(Ship, CellSize));
+				Ship->SetRotation(GB->GetCorrectShipRotation(Ship));
 				GB->AddShip(Ship, CellCoord{ x, y });
 				break;
 			}

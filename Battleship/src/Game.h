@@ -15,6 +15,12 @@ class Ball2D;
 class GameBoard;
 class PlaceableBattleshipButton;
 
+enum CurrentPlayersTurn 
+{
+	Player = 0,
+	Opponent
+};
+
 class Game
 {
 public:
@@ -58,13 +64,14 @@ private:
 
 	GameBoard* m_GameBoard_Player = nullptr;
 	GameBoard* m_GameBoard_Opponent = nullptr;
+	CurrentPlayersTurn PlayersTurn = CurrentPlayersTurn::Player;
 	std::vector<BattleshipStats> m_ShipTamplates;
 	std::vector<PlaceableBattleshipButton*> m_ShipsButtons;
 
 	bool m_RedrawRequested = true;
 	bool m_IsPlacementStage = false;
 	PlaceableBattleshipButton* m_ChoosenShipTamplate = nullptr;
-	ShipOritentation m_PlacementShipOrientation = ShipOritentation::Horizontal;
+	ShipOrientation m_PlacementShipOrientation = ShipOrientation::Horizontal;
 	
 	std::string BallTexturePaths[3] = { 
 		"Assets/redball.png", 
@@ -86,6 +93,10 @@ private:
 	void DestroyPlacementPanel();
 
 	void SwitchGameboards();
+
+	void PlacementStageClickHandle(const int Mouse_X, const int Mouse_Y);
+
+	void GameStageClickHandle(const int Mouse_X, const int Mouse_Y);
 
 	GameBoard* CreateAndPopulateGameboard();
 };

@@ -1,7 +1,8 @@
 #pragma once
 
 #include <vector>
-#include "../Battleship.h"
+//#include "../Battleship.h"
+#include "../Math.h"
 
 class BoardCell;
 using GridRow = std::vector<BoardCell>;
@@ -9,12 +10,23 @@ using BoardGrid = std::vector<GridRow>;
 
 class GameBoardPopulator;
 class GameBoardDrawer;
+class Battleship;
+struct BattleshipStats;
+class Game;
+enum ShipOrientation;
 
 // TODO: Make immutable
 struct CellCoord 
 {
 	uint8_t x = 0;
 	uint8_t y = 0;
+};
+
+enum CellState 
+{
+	Empty = 0,
+	ShipPlaced,
+	ShipDamaged
 };
 
 static CellCoord operator+(const CellCoord& A, const CellCoord& B)
@@ -46,21 +58,33 @@ public:
 	void SetShip(Battleship* Ship) 
 	{ 
 		m_ContainedShip = Ship; 
+		m_CellState = CellState::ShipPlaced;
 		m_IsAvailableForShip = false;
 	}
 
-	void ClearShip() { m_ContainedShip = nullptr; }
+	void ClearShip() 
+	{ 
+		m_ContainedShip = nullptr; 
+		m_CellState = CellState::Empty;
+		// TODO: Clear availability for neighboors
+	}
 
-	bool IsEmpty() const { return m_ContainedShip == nullptr; }
+	bool IsEmpty() const { return m_CellState == CellState::Empty; }
 
 	bool IsAvailableForShip() const { return m_IsAvailableForShip; }
 
 	void SetAvaiablityForShip(bool Value) { m_IsAvailableForShip = Value; }
 
+	CellState GetCellState() const { return m_CellState; }
+
+	void SetCellState(CellState State) { m_CellState = State; }
+
 private:
 	CellCoord m_Coords;
 
 	Battleship* m_ContainedShip = nullptr;
+
+	CellState m_CellState = CellState::Empty;
 
 	bool m_IsAvailableForShip = true;
 };
@@ -68,7 +92,7 @@ private:
 class GameBoard
 {
 public:
-	GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight);
+	GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* GameInstance);
 
 	~GameBoard();
 
@@ -95,18 +119,14 @@ public:
 	bool IsAvailableForShip(
 		const CellCoord CellCoords,
 		BattleshipStats const* ShipStats,
-		const ShipOritentation ShipOrient);
+		ShipOrientation const* ShipOrient);
 
 	// TODO: Make const
 	bool IsAvailableForShip(
 		const CellCoord CellCoords,
-		Battleship* Ship) 
-	{
-		return IsAvailableForShip(
-			CellCoords, Ship->GetShipStats(), Ship->GetShipOrientation());
-	}
+		Battleship* Ship);
 
-	Vector2 GetCorrectShipPosition(Battleship* Ship, const CellCoord Coord, const float CellSize = 100.0f) const;
+	Vector2 GetCorrectShipPosition(Battleship* Ship, const float CellSize = 100.0f) const;
 
 	float GetCorrectShipRotation(Battleship* Ship) const;
 

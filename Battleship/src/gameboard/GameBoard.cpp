@@ -3,8 +3,9 @@
 #include <algorithm>
 #include "SimpleGBP.h"
 #include "SimpleGBD.h"
+#include "../Battleship.h"
 
-GameBoard::GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight)
+GameBoard::GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* GameInstance)
 {
 	m_Grid = BoardGrid(BoardHeight, GridRow(BoardWidth));
 	for (uint8_t y = 0; y < BoardHeight; ++y) 
@@ -16,7 +17,7 @@ GameBoard::GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight)
 	}
 
 	BoardPopulator = new SimpleGBP();
-	BoardDrawer = new SimpleGBD(this);
+	BoardDrawer = new SimpleGBD(this, GameInstance);
 }
 
 GameBoard::~GameBoard()
@@ -39,10 +40,10 @@ bool GameBoard::AddShip(Battleship* Ship, const CellCoord Pos)
 bool GameBoard::IsAvailableForShip(
 	const CellCoord CellCoords, 
 	BattleshipStats const* ShipStats, 
-	const ShipOritentation ShipOrient)
+	ShipOrientation const* ShipOrient)
 {
 	const CellCoord Direction = 
-		ShipOrient == ShipOritentation::Horizontal 
+		*ShipOrient == ShipOrientation::Horizontal 
 		? CellCoord{ 1, 0 } : CellCoord{ 0, 1 };
 	if (!IsValidCoords(CellCoords) || 
 		!IsValidCoords(CellCoords + Direction * (ShipStats->m_ShipLength - 1))) 
@@ -63,19 +64,27 @@ bool GameBoard::IsAvailableForShip(
 	return true;
 }
 
-Vector2 GameBoard::GetCorrectShipPosition(Battleship* Ship, const CellCoord Coord, const float CellSize) const
+bool GameBoard::IsAvailableForShip(const CellCoord CellCoords, Battleship* Ship)
+{
+	ShipOrientation Orientation = Ship->GetShipOrientation();
+	return IsAvailableForShip(
+		CellCoords, Ship->GetShipStats(), &Orientation);
+}
+
+Vector2 GameBoard::GetCorrectShipPosition(Battleship* Ship, const float CellSize) const
 {
 	const float CellHalfSize = CellSize / 2.0f;
-	const ShipOritentation Orientation = Ship->GetShipOrientation();
+	const ShipOrientation Orientation = Ship->GetShipOrientation();
 	const BattleshipStats* ShipStat = Ship->GetShipStats();
+	const CellCoord ShipCoord = Ship->GetShipOnBoardCoords();
 	int TexWidth, TexHeight;
 	SDL_QueryTexture(ShipStat->m_ShipTexture, nullptr, nullptr, &TexWidth, &TexHeight);
 	return Vector2
 	{
 		// H_x = x * 100 - TexWidth / 2 + length * 100 / 2.0
-		(float)(Coord.x * CellSize + CellHalfSize * Orientation + (ShipStat->m_ShipLength * CellSize / 2.0f) * !Orientation),
-		(float)(Coord.y * CellSize + CellHalfSize * !Orientation + (ShipStat->m_ShipLength * CellSize / 2.0f) * Orientation)
-	};
+		(float)(ShipCoord.x * CellSize + CellHalfSize * Orientation + (ShipStat->m_ShipLength * CellSize / 2.0f) * !Orientation),
+		(float)(ShipCoord.y * CellSize + CellHalfSize * !Orientation + (ShipStat->m_ShipLength * CellSize / 2.0f) * Orientation)
+	} + GetBoardDrawer()->GetBoardPosition();
 }
 
 float GameBoard::GetCorrectShipRotation(Battleship* Ship) const
@@ -87,7 +96,7 @@ void GameBoard::InsertShip(Battleship* Ship, const CellCoord Pos)
 {
 	const uint8_t ShipLength = Ship->GetShipStats()->m_ShipLength;
 	const CellCoord Direction = 
-		Ship->GetShipOrientation() == ShipOritentation::Horizontal 
+		Ship->GetShipOrientation() == ShipOrientation::Horizontal 
 		? CellCoord{ 1, 0 } : CellCoord{ 0, 1 };
 	for (uint8_t Offset = 0; Offset < ShipLength; ++Offset)
 	{
@@ -116,11 +125,6 @@ std::vector<CellCoord> GameBoard::GetNeighbourCoords(const CellCoord Coords) con
 			if (x == Coords.x && y == Coords.y) continue;
 			Result.push_back({ x, y });
 		}
-	}
-
-	if (Result.size() > 8) 
-	{
-		return Result;
 	}
 
 	return Result;
