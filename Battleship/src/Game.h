@@ -62,6 +62,9 @@ private:
 	std::vector<PlaceableBattleshipButton*> m_ShipsButtons;
 
 	bool m_RedrawRequested = true;
+	bool m_IsPlacementStage = false;
+	PlaceableBattleshipButton* m_ChoosenShipTamplate = nullptr;
+	ShipOritentation m_PlacementShipOrientation = ShipOritentation::Horizontal;
 	
 	std::string BallTexturePaths[3] = { 
 		"Assets/redball.png", 
@@ -73,5 +76,17 @@ private:
 	void OnMouseOverHandle(const int Mouse_X, const int Mouse_Y);
 
 	void OnMouseDownHandle(const int Mouse_X, const int Mouse_Y);
+
+	void StartPlacementStage(const std::vector<BattleshipStats>& Tamplates);
+
+	void FinishPlacementStage();
+
+	void CreatePlacementPanel(const std::vector<BattleshipStats>& Tamplates);
+
+	void DestroyPlacementPanel();
+
+	void SwitchGameboards();
+
+	GameBoard* CreateAndPopulateGameboard();
 };
 

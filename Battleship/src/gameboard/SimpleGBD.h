@@ -16,6 +16,8 @@ public:
 	virtual CellCoord GetWorldToBoardPos(
 		GameBoard* Board, const Vector2 WorldPos, const float CellSize = 100.0f) const override;
 
+	virtual void SetDrawVisablity(bool IsVisible, GameBoard* Board) override;
+
 protected:
 	virtual void DrawGrid(
 		GameBoard* Board, SDL_Renderer* Renderer, const float CellSize = 100.0f);

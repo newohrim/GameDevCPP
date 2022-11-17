@@ -63,6 +63,26 @@ bool GameBoard::IsAvailableForShip(
 	return true;
 }
 
+Vector2 GameBoard::GetCorrectShipPosition(Battleship* Ship, const CellCoord Coord, const float CellSize) const
+{
+	const float CellHalfSize = CellSize / 2.0f;
+	const ShipOritentation Orientation = Ship->GetShipOrientation();
+	const BattleshipStats* ShipStat = Ship->GetShipStats();
+	int TexWidth, TexHeight;
+	SDL_QueryTexture(ShipStat->m_ShipTexture, nullptr, nullptr, &TexWidth, &TexHeight);
+	return Vector2
+	{
+		// H_x = x * 100 - TexWidth / 2 + length * 100 / 2.0
+		(float)(Coord.x * CellSize + CellHalfSize * Orientation + (ShipStat->m_ShipLength * CellSize / 2.0f) * !Orientation),
+		(float)(Coord.y * CellSize + CellHalfSize * !Orientation + (ShipStat->m_ShipLength * CellSize / 2.0f) * Orientation)
+	};
+}
+
+float GameBoard::GetCorrectShipRotation(Battleship* Ship) const
+{
+	return !Ship->GetShipOrientation() * M_PI / 2;
+}
+
 void GameBoard::InsertShip(Battleship* Ship, const CellCoord Pos)
 {
 	const uint8_t ShipLength = Ship->GetShipStats()->m_ShipLength;

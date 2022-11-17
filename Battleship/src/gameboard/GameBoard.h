@@ -106,6 +106,10 @@ public:
 			CellCoords, Ship->GetShipStats(), Ship->GetShipOrientation());
 	}
 
+	Vector2 GetCorrectShipPosition(Battleship* Ship, const CellCoord Coord, const float CellSize = 100.0f) const;
+
+	float GetCorrectShipRotation(Battleship* Ship) const;
+
 	GameBoardPopulator* GetBoardPopulator() const { return BoardPopulator; }
 
 	GameBoardDrawer* GetBoardDrawer() const { return BoardDrawer; }

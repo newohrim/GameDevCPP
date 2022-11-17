@@ -1,5 +1,7 @@
 #include "SimpleGBD.h"
 
+#include "../SpriteComponent.h"
+
 #ifndef CACHE_COLOR_IN
 #define CACHE_COLOR_IN() \
 SDL_Color CachedColor; \
@@ -26,6 +28,9 @@ SimpleGBD::SimpleGBD(GameBoard* Board)
 
 void SimpleGBD::DrawBoard(GameBoard* Board, SDL_Renderer* Renderer, const float CellSize)
 {
+	if (!IsVisible())
+		return;
+
 	DrawGrid(Board, Renderer, CellSize);
 	HighlightCurrentCell(Board, Renderer, CellSize);
 }
@@ -39,6 +44,17 @@ CellCoord SimpleGBD::GetWorldToBoardPos(GameBoard* Board, const Vector2 WorldPos
 	};
 
 	return Result;
+}
+
+void SimpleGBD::SetDrawVisablity(bool IsVisible, GameBoard* Board)
+{
+	GameBoardDrawer::SetDrawVisablity(IsVisible, Board);
+
+	const std::vector<Battleship*>& Ships = Board->GetShipsOnBoard();
+	for (Battleship* Ship : Ships) 
+	{
+		Ship->GetSpriteComponent()->SetIsVisible(IsVisible);
+	}
 }
 
 void SimpleGBD::DrawGrid(GameBoard* Board, SDL_Renderer* Renderer, const float CellSize)

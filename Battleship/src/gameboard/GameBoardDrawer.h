@@ -20,7 +20,13 @@ public:
 
 	void ClearCurrMouseOverCell() { m_CurrMouseOverCell = nullptr; }
 
+	bool IsVisible() const { return m_IsVisible; }
+
+	virtual void SetDrawVisablity(bool IsVisible, GameBoard* Board) { m_IsVisible = IsVisible; }
+
 private:
 	BoardCell* m_CurrMouseOverCell = nullptr;
+
+	bool m_IsVisible = true;
 };
 
