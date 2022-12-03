@@ -12,6 +12,7 @@
 #include "gameboard/GameBoardPopulator.h"
 #include "PlaceableBattleshipButton.h"
 #include "RectangleClickZone.h"
+#include "ai/SeaBattleSimpleAI.h"
 
 #include <iostream>
 
@@ -330,6 +331,7 @@ void Game::LoadData()
 		{ GetTexture("Assets/ships/destroyer.png"), 2, 3 }
 	};
 	m_GameBoard_Player = new GameBoard(10, 10, this);
+	m_OpponentAI = new SeaBattleSimpleAI(m_GameBoard_Player, this);
 	StartPlacementStage(m_ShipTamplates);
 
 	/*
@@ -474,10 +476,11 @@ void Game::FinishPlacementStage()
 	DestroyPlacementPanel();
 	m_IsPlacementStage = false;
 
+	// TODO: Replace opponents board creation to load game data
 	m_GameBoard_Opponent = CreateAndPopulateGameboard();
 	m_GameBoard_Opponent->GetBoardDrawer()->SetBoardPosition(Vector2{ 50.0f * 10 + 100.0f, 0.0f }, m_GameBoard_Opponent, 50.0f);
 	m_GameBoard_Opponent->GetBoardDrawer()->SetShipsVisability(false, m_GameBoard_Opponent);
-	PlayersTurn = CurrentPlayersTurn::Player;
+	m_PlayersTurn = CurrentPlayersTurn::Player;
 	//SwitchGameboards();
 }
 
@@ -607,9 +610,16 @@ void Game::GameStageClickHandle(const int Mouse_X, const int Mouse_Y)
 		if (Cell.GetCellState() == CellState::ShipPlaced) 
 		{
 			Cell.SetCellState(CellState::ShipDamaged);
-			//SwitchGameboards();
-			RequestRedraw();
 		}
+		else 
+		{
+			Cell.SetCellState(CellState::Missed);
+		}
+		m_PlayersTurn = CurrentPlayersTurn::Opponent;
+		m_OpponentAI->MakeMove();
+		// TODO: Add move handle
+		m_PlayersTurn = CurrentPlayersTurn::Player;
+		RequestRedraw();
 	}
 }
 

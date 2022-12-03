@@ -26,7 +26,8 @@ enum CellState
 {
 	Empty = 0,
 	ShipPlaced,
-	ShipDamaged
+	ShipDamaged,
+	Missed
 };
 
 static CellCoord operator+(const CellCoord& A, const CellCoord& B)
@@ -42,6 +43,11 @@ static CellCoord operator-(const CellCoord& A, const CellCoord& B)
 static CellCoord operator*(const CellCoord& A, const int B)
 {
 	return CellCoord{ static_cast<uint8_t>(A.x * B), static_cast<uint8_t>(A.y * B) };
+}
+
+static bool operator==(const CellCoord& A, const CellCoord& B)
+{
+	return (A.x == B.x) && (A.y == B.y);
 }
 
 class BoardCell 
@@ -136,6 +142,12 @@ public:
 
 	const std::vector<Battleship*>& GetShipsOnBoard() const { return m_Ships; }
 
+	std::vector<CellCoord> GetVonNeumannNeighborhood(const CellCoord Coords, int Margin = 0) const;
+
+	std::vector<CellCoord> GetMooreNeighborhood(const CellCoord Coords) const;
+
+	std::vector<CellCoord> GetCornersNeighborhood(const CellCoord Coords, int Margin = 0) const;
+
 protected:
 	GameBoardPopulator* BoardPopulator;
 
@@ -151,7 +163,5 @@ private:
 	void InsertShip(Battleship* Ship, const CellCoord Pos);
 
 	void MakePaddingAround(const CellCoord Coords);
-
-	std::vector<CellCoord> GetNeighbourCoords(const CellCoord Coords) const;
 };
 

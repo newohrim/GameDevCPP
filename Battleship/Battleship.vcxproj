@@ -162,6 +162,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ai\SeaBattleSimpleAI.cpp" />
     <ClCompile Include="src\RectangleClickZone.cpp" />
     <ClCompile Include="src\PlaceableBattleshipButton.cpp" />
     <ClCompile Include="src\gameboard\SimpleGBD.cpp" />
@@ -182,6 +183,7 @@
     <ClCompile Include="src\SpriteComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ai\SeaBattleSimpleAI.h" />
     <ClInclude Include="src\RectangleClickZone.h" />
     <ClInclude Include="src\PlaceableBattleshipButton.h" />
     <ClInclude Include="src\gameboard\GameBoardDrawer.h" />

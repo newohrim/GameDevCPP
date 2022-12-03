@@ -14,6 +14,7 @@ struct SDL_Texture;
 class Ball2D;
 class GameBoard;
 class PlaceableBattleshipButton;
+class SeaBattleSimpleAI;
 
 enum CurrentPlayersTurn 
 {
@@ -64,9 +65,10 @@ private:
 
 	GameBoard* m_GameBoard_Player = nullptr;
 	GameBoard* m_GameBoard_Opponent = nullptr;
-	CurrentPlayersTurn PlayersTurn = CurrentPlayersTurn::Player;
+	CurrentPlayersTurn m_PlayersTurn = CurrentPlayersTurn::Player;
 	std::vector<BattleshipStats> m_ShipTamplates;
 	std::vector<PlaceableBattleshipButton*> m_ShipsButtons;
+	SeaBattleSimpleAI* m_OpponentAI;
 
 	bool m_RedrawRequested = true;
 	bool m_IsPlacementStage = false;

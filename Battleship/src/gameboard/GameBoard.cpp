@@ -109,7 +109,7 @@ void GameBoard::InsertShip(Battleship* Ship, const CellCoord Pos)
 
 void GameBoard::MakePaddingAround(const CellCoord Coords)
 {
-	std::vector<CellCoord> PaddingAround = GetNeighbourCoords(Coords);
+	std::vector<CellCoord> PaddingAround = GetMooreNeighborhood(Coords);
 	for (CellCoord C : PaddingAround) 
 	{
 		BoardCell& Cell = GetCell_Private(C);
@@ -117,7 +117,7 @@ void GameBoard::MakePaddingAround(const CellCoord Coords)
 	}
 }
 
-std::vector<CellCoord> GameBoard::GetNeighbourCoords(const CellCoord Coords) const
+std::vector<CellCoord> GameBoard::GetMooreNeighborhood(const CellCoord Coords) const
 {
 	std::vector<CellCoord> Result;
 	for (uint8_t x = std::max(Coords.x, (uint8_t)1U) - 1; x < std::min((uint8_t)(Coords.x + 2U), GetBoardWidth()); ++x) {
@@ -126,6 +126,42 @@ std::vector<CellCoord> GameBoard::GetNeighbourCoords(const CellCoord Coords) con
 			Result.push_back({ x, y });
 		}
 	}
+
+	return Result;
+}
+
+std::vector<CellCoord> GameBoard::GetCornersNeighborhood(const CellCoord Coords, int Margin) const
+{
+	std::vector<CellCoord> Result;
+	if (Coords.x > Margin) 
+	{
+		if (Coords.y > Margin)
+			Result.push_back(Coords - CellCoord{ 1, 1 });
+		if (Coords.y < GetBoardHeight() - 1 - Margin)
+			Result.push_back(Coords - CellCoord{ 1, 0 } + CellCoord{ 0, 1 });
+	}
+	if (Coords.x < GetBoardWidth() - 1 - Margin) 
+	{
+		if (Coords.y > Margin)
+			Result.push_back(Coords + CellCoord{ 1, 0 } - CellCoord{ 0, 1 });
+		if (Coords.y < GetBoardHeight() - 1)
+			Result.push_back(Coords + CellCoord{ 1, 1 });
+	}
+
+	return Result;
+}
+
+std::vector<CellCoord> GameBoard::GetVonNeumannNeighborhood(const CellCoord Coords, int Margin) const
+{
+	std::vector<CellCoord> Result;
+	if (Coords.y > Margin)
+		Result.push_back(Coords - CellCoord{ 0, 1 });
+	if (Coords.y < GetBoardHeight() - 1 - Margin)
+		Result.push_back(Coords + CellCoord{ 0, 1 });
+	if (Coords.x > Margin)
+		Result.push_back(Coords - CellCoord{ 1, 0 });
+	if (Coords.x < GetBoardWidth() - 1 - Margin)
+		Result.push_back(Coords + CellCoord{ 1, 0 });
 
 	return Result;
 }

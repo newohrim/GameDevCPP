@@ -148,26 +148,41 @@ void SimpleGBD::HighlightCurrentCell(GameBoard* Board, SDL_Renderer* Renderer, c
 
 void SimpleGBD::DrawCellsStates(GameBoard* Board, SDL_Renderer* Renderer, const float CellSize)
 {
+	CACHE_COLOR_IN();
+
 	const Vector2 BoardPos = GetBoardPosition();
 	for (const SDL_Rect& Quad : Quads) 
 	{
 		const BoardCell& Cell = Board->GetCell({ (uint8_t)Quad.x, (uint8_t)Quad.y });
-		if (Cell.GetCellState() == CellState::ShipDamaged) 
+		const CellState State = Cell.GetCellState();
+		if (State == CellState::Empty)
+			continue;
+		const SDL_Rect Rect =
 		{
-			const SDL_Rect Rect = 
-			{ 
-				Quad.x * CellSize + BoardPos.x, 
-				Quad.y * CellSize + BoardPos.y, 
-				Quad.w * CellSize, 
-				Quad.h * CellSize 
-			};
-			SDL_RenderCopyEx(Renderer,
-				m_CellState_Damaged,
-				nullptr,
-				&Rect,
-				0.0f,
-				nullptr,
-				SDL_FLIP_NONE);
+			Quad.x * CellSize + BoardPos.x,
+			Quad.y * CellSize + BoardPos.y,
+			Quad.w * CellSize,
+			Quad.h * CellSize
+		};
+		switch (State)
+		{
+			case CellState::ShipDamaged:
+				SDL_RenderCopyEx(Renderer,
+					m_CellState_Damaged,
+					nullptr,
+					&Rect,
+					0.0f,
+					nullptr,
+					SDL_FLIP_NONE);
+				break;
+			case CellState::Missed:
+				SDL_SetRenderDrawColor(Renderer, 50, 50, 50, 255);
+				SDL_RenderFillRect(Renderer, &Rect);
+				break;
+			default:
+				break;
 		}
 	}
+
+	CACHE_COLOR_OUT();
 }
