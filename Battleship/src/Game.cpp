@@ -13,12 +13,13 @@
 #include "PlaceableBattleshipButton.h"
 #include "RectangleClickZone.h"
 #include "ai/SeaBattleSimpleAI.h"
+#include "TextUIComponent.h"
 
 #include <iostream>
 
 bool Game::Initialize() 
 {
-	int SDLResult = SDL_Init(SDL_INIT_VIDEO);
+	const int SDLResult = SDL_Init(SDL_INIT_VIDEO);
 	if (SDLResult != 0) 
 	{
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
@@ -39,8 +40,8 @@ bool Game::Initialize()
 		return false;
 	}
 
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 
 	mRenderer = SDL_CreateRenderer(
 		mWindow, // Window to create renderer for
@@ -51,6 +52,13 @@ bool Game::Initialize()
 	if (IMG_Init(IMG_INIT_PNG) == 0)
 	{
 		SDL_Log("Unable to initialize SDL_image: %s", SDL_GetError());
+		return false;
+	}
+
+	const int TTF_Result = TTF_Init();
+	if (TTF_Result != 0)
+	{
+		SDL_Log("Unable to initialize TTF: %s", TTF_GetError());
 		return false;
 	}
 
@@ -75,6 +83,7 @@ void Game::Shutdown()
 {
 	UnloadData();
 	IMG_Quit();
+	TTF_Quit();
 	SDL_DestroyRenderer(mRenderer);
 	SDL_DestroyWindow(mWindow);
 	SDL_Quit();
@@ -138,6 +147,21 @@ void Game::RemoveSprite(SpriteComponent* SpriteToRemove)
 	// (We can't swap because it ruins ordering)
 	auto iter = std::find(mSprites.begin(), mSprites.end(), SpriteToRemove);
 	mSprites.erase(iter);
+}
+
+void Game::AddTextComponent(TextUIComponent* TextComp)
+{
+	m_TextComponents.push_back(TextComp);
+}
+
+void Game::RemoveTextComponent(TextUIComponent* TextComp)
+{
+	auto iter = 
+		std::find(m_TextComponents.begin(), m_TextComponents.end(), TextComp);
+	if (iter != m_TextComponents.end()) 
+	{
+		m_TextComponents.erase(iter);
+	}
 }
 
 SDL_Texture* Game::GetTexture(const std::string& fileName)
@@ -315,6 +339,10 @@ void Game::GenerateOutput()
 		{
 			sprite->Draw(mRenderer);
 		}
+		for (TextUIComponent* text : m_TextComponents) 
+		{
+			text->DrawText(mRenderer);
+		}
 
 		SDL_RenderPresent(mRenderer);
 
@@ -324,30 +352,13 @@ void Game::GenerateOutput()
 
 void Game::LoadData()
 {
-	m_ShipTamplates = 
+	m_MainTextFont = TTF_OpenFont("Assets/fonts/DhasterRegular.ttf", 24);
+	if (!m_MainTextFont) 
 	{
-		{ GetTexture("Assets/ships/carrier.png"), 5, 1 },
-		{ GetTexture("Assets/ships/battleship.png"), 4, 2 },
-		{ GetTexture("Assets/ships/cruiser.png"), 3, 2 },
-		{ GetTexture("Assets/ships/submarine.png"), 3, 3 },
-		{ GetTexture("Assets/ships/destroyer.png"), 2, 3 }
-	};
-	m_GameBoard_Player = new GameBoard(10, 10, this);
-	m_OpponentAI = new SeaBattleSimpleAI(m_GameBoard_Player, this);
-	StartPlacementStage(m_ShipTamplates);
-
-	/*
-	const int BallsNum = Random::GetIntRange(10, 100);
-	Balls = std::vector<Ball2D*>(BallsNum);
-	for (int i = 0; i < Balls.size(); ++i) 
-	{
-		Balls[i] = CreateBall();
+		SDL_Log(TTF_GetError());
 	}
-	*/
 
-	//Logo = new DVDLogo(this);
-	//Logo->SetPosition(Vector2(1024.0f / 2.0f, 768.0f / 2.0f));
-
+	BeginGame();
 }
 
 void Game::UnloadData()
@@ -370,6 +381,21 @@ void Game::UnloadData()
 		SDL_DestroyTexture(i.second);
 	}
 	mTextures.clear();
+}
+
+void Game::BeginGame()
+{
+	m_ShipTamplates =
+	{
+		{ GetTexture("Assets/ships/carrier.png"), 5, 1 },
+		{ GetTexture("Assets/ships/battleship.png"), 4, 2 },
+		{ GetTexture("Assets/ships/cruiser.png"), 3, 2 },
+		{ GetTexture("Assets/ships/submarine.png"), 3, 3 },
+		{ GetTexture("Assets/ships/destroyer.png"), 2, 3 }
+	};
+	m_GameBoard_Player = new GameBoard(10, 10, this);
+	m_OpponentAI = new SeaBattleSimpleAI(m_GameBoard_Player, this);
+	StartPlacementStage(m_ShipTamplates);
 }
 
 void Game::GameOver(const PlayerEnum Winner)
@@ -401,7 +427,7 @@ void Game::ResetGame()
 	DestroyPlacementPanel();
 
 	// Reload data and recreate entities
-	LoadData();
+	BeginGame();
 }
 
 void Game::ResolveCollisions()
@@ -526,12 +552,16 @@ void Game::CreatePlacementPanel(const std::vector<BattleshipStats>& Tamplates)
 	float PlaceableShipsPanel_Y = 0.0f;
 	for (BattleshipStats& ShipTamplate : m_ShipTamplates)
 	{
-		m_ShipsButtons.push_back(
-			new PlaceableBattleshipButton(ShipTamplate, ShipTamplate.m_ShipsBeginCount, this));
+		m_ShipsButtons.push_back(new PlaceableBattleshipButton(
+			ShipTamplate, ShipTamplate.m_ShipsBeginCount, m_MainTextFont, this));
 		PlaceableShipsPanel_Y += 50.0f;
 		m_ShipsButtons.back()->SetPosition(
 			Vector2{ PlaceableShipsPanel_X, PlaceableShipsPanel_Y });
 		m_ShipsButtons.back()->SetRotation(Math::Pi / 2.0f);
+		const Vector2 Pos = 
+			m_ShipsButtons.back()->GetPosition() + Vector2{ 150.0f, -25.0f };
+		m_ShipsButtons.back()->GetTextComponent()->
+			SetTextPosition((int)Pos.x, (int)Pos.y);
 	}
 
 	RequestRedraw();

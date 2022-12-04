@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Battleship.h"
+#include "SDL_ttf.h"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -36,7 +37,12 @@ public:
 	void AddSprite(class SpriteComponent* SpriteToAdd);
 	void RemoveSprite(class SpriteComponent* SpriteToRemove);
 
+	void AddTextComponent(class TextUIComponent* TextComp);
+	void RemoveTextComponent(class TextUIComponent* TextComp);
+
 	SDL_Texture* GetTexture(const std::string& fileName);
+
+	SDL_Renderer* GetRenderer() { return mRenderer; }
 
 	void RequestRedraw() { m_RedrawRequested = true; }
 
@@ -48,6 +54,8 @@ private:
 	void GenerateOutput();
 	void LoadData();
 	void UnloadData();
+
+	void BeginGame();
 	void GameOver(const PlayerEnum Winner);
 	void ResetGame();
 
@@ -58,6 +66,7 @@ private:
 	std::vector<class Actor*> mActors;
 	std::vector<class Actor*> mPendingActors;
 	std::vector<class SpriteComponent*> mSprites;
+	std::vector<class TextUIComponent*> m_TextComponents;
 
 	SDL_Window* mWindow = nullptr;
 	SDL_Renderer* mRenderer;
@@ -76,6 +85,7 @@ private:
 	bool m_IsPlacementStage = false;
 	PlaceableBattleshipButton* m_ChoosenShipTamplate = nullptr;
 	ShipOrientation m_PlacementShipOrientation = ShipOrientation::Horizontal;
+	TTF_Font* m_MainTextFont = nullptr;
 	
 	std::string BallTexturePaths[3] = { 
 		"Assets/redball.png", 
