@@ -22,7 +22,13 @@ GameBoard::GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* 
 
 GameBoard::~GameBoard()
 {
+	for (Battleship* Ship : m_Ships) 
+	{
+		delete Ship;
+	}
+
 	delete BoardPopulator;
+	delete BoardDrawer;
 }
 
 bool GameBoard::AddShip(Battleship* Ship, const CellCoord Pos)
@@ -151,6 +157,19 @@ std::vector<CellCoord> GameBoard::GetCornersNeighborhood(const CellCoord Coords,
 	return Result;
 }
 
+bool GameBoard::CheckGameOverCondition() const
+{
+	for (const Battleship* Ship : m_Ships) 
+	{
+		if (Ship->GetShipHealth() > 0) 
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 std::vector<CellCoord> GameBoard::GetVonNeumannNeighborhood(const CellCoord Coords, int Margin) const
 {
 	std::vector<CellCoord> Result;
@@ -164,4 +183,15 @@ std::vector<CellCoord> GameBoard::GetVonNeumannNeighborhood(const CellCoord Coor
 		Result.push_back(Coords + CellCoord{ 1, 0 });
 
 	return Result;
+}
+
+void BoardCell::SetCellState(CellState State)
+{
+	if (State == CellState::ShipDamaged &&
+		m_CellState == CellState::ShipPlaced)
+	{
+		m_ContainedShip->TakeDamageHandle();
+	}
+
+	m_CellState = State;
 }

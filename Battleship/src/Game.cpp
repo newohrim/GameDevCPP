@@ -232,6 +232,8 @@ void Game::ProcessInput()
 						m_PlacementShipOrientation =
 							static_cast<ShipOrientation>((m_PlacementShipOrientation + 1) % 2);
 						break;
+					default:
+						break;
 				}
 				break;
 			default:
@@ -351,7 +353,9 @@ void Game::LoadData()
 void Game::UnloadData()
 {
 	delete m_GameBoard_Player;
+	m_GameBoard_Player = nullptr;
 	delete m_GameBoard_Opponent;
+	m_GameBoard_Opponent = nullptr;
 
 	// Delete actors
 	// Because ~Actor calls RemoveActor, have to use a different style loop
@@ -366,6 +370,38 @@ void Game::UnloadData()
 		SDL_DestroyTexture(i.second);
 	}
 	mTextures.clear();
+}
+
+void Game::GameOver(const PlayerEnum Winner)
+{
+	if (Winner == PlayerEnum::Player) 
+	{
+		std::cout << "Player won." << '\n';
+	}
+	else 
+	{
+		std::cout << "Opponent won." << '\n';
+	}
+
+	ResetGame();
+	RequestRedraw();
+}
+
+void Game::ResetGame()
+{
+	// Wipe all entities
+	delete m_GameBoard_Player;
+	m_GameBoard_Player = nullptr;
+	delete m_GameBoard_Opponent;
+	m_GameBoard_Opponent = nullptr;
+	delete m_OpponentAI;
+	m_OpponentAI = nullptr;
+
+	// Destroy panel if still exists
+	DestroyPlacementPanel();
+
+	// Reload data and recreate entities
+	LoadData();
 }
 
 void Game::ResolveCollisions()
@@ -480,7 +516,7 @@ void Game::FinishPlacementStage()
 	m_GameBoard_Opponent = CreateAndPopulateGameboard();
 	m_GameBoard_Opponent->GetBoardDrawer()->SetBoardPosition(Vector2{ 50.0f * 10 + 100.0f, 0.0f }, m_GameBoard_Opponent, 50.0f);
 	m_GameBoard_Opponent->GetBoardDrawer()->SetShipsVisability(false, m_GameBoard_Opponent);
-	m_PlayersTurn = CurrentPlayersTurn::Player;
+	m_PlayersTurn = PlayerEnum::Player;
 	//SwitchGameboards();
 }
 
@@ -607,18 +643,31 @@ void Game::GameStageClickHandle(const int Mouse_X, const int Mouse_Y)
 		m_GameBoard_Opponent->IsValidCoords(MouseOnBoardCoord_Opponent))
 	{
 		BoardCell& Cell = m_GameBoard_Opponent->GetCell(MouseOnBoardCoord_Opponent);
-		if (Cell.GetCellState() == CellState::ShipPlaced) 
+		const CellState State = Cell.GetCellState();
+		switch (State)
 		{
-			Cell.SetCellState(CellState::ShipDamaged);
+			case CellState::ShipPlaced:
+				Cell.SetCellState(CellState::ShipDamaged);
+				if (m_GameBoard_Opponent->CheckGameOverCondition())
+				{
+					GameOver(PlayerEnum::Player);
+					return;
+				}
+				break;
+			case CellState::Empty:
+				Cell.SetCellState(CellState::Missed);
+				break;
+			default:
+				break;
 		}
-		else 
-		{
-			Cell.SetCellState(CellState::Missed);
-		}
-		m_PlayersTurn = CurrentPlayersTurn::Opponent;
+		m_PlayersTurn = PlayerEnum::Opponent;
 		m_OpponentAI->MakeMove();
-		// TODO: Add move handle
-		m_PlayersTurn = CurrentPlayersTurn::Player;
+		if (m_GameBoard_Player->CheckGameOverCondition()) 
+		{
+			GameOver(PlayerEnum::Opponent);
+			return;
+		}
+		m_PlayersTurn = PlayerEnum::Player;
 		RequestRedraw();
 	}
 }

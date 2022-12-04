@@ -35,6 +35,7 @@ void SeaBattleSimpleAI::MakeMove()
 	}
 	*/
 
+	// Pick a random cell coord mainly from m_PositiveMoves
 	CellCoord PickedCoord;
 	if (m_PositiveMoves.empty()) 
 	{
@@ -43,13 +44,19 @@ void SeaBattleSimpleAI::MakeMove()
 		PickedCoord = m_PotentialMoves[RandomIndex];
 		m_PotentialMoves.erase(m_PotentialMoves.begin() + RandomIndex);
 	}
-	else 
+	else if (!m_PotentialMoves.empty())
 	{
 		const int RandomIndex =
 			Random::GetIntRange(0, m_PositiveMoves.size() - 1);
 		PickedCoord = m_PositiveMoves[RandomIndex].m_Coord;
 		m_PositiveMoves.erase(m_PositiveMoves.begin() + RandomIndex);
 	}
+	else 
+	{
+		// No moves left
+		return;
+	}
+
 	BoardCell& PickedCell = m_TargetGameboard->GetCell(PickedCoord);
 	if (!PickedCell.IsEmpty() && 
 		PickedCell.GetCellState() == CellState::ShipPlaced) 

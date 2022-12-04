@@ -83,7 +83,7 @@ public:
 
 	CellState GetCellState() const { return m_CellState; }
 
-	void SetCellState(CellState State) { m_CellState = State; }
+	void SetCellState(CellState State);
 
 private:
 	CellCoord m_Coords;
@@ -141,6 +141,8 @@ public:
 	GameBoardDrawer* GetBoardDrawer() const { return BoardDrawer; }
 
 	const std::vector<Battleship*>& GetShipsOnBoard() const { return m_Ships; }
+
+	bool CheckGameOverCondition() const;
 
 	std::vector<CellCoord> GetVonNeumannNeighborhood(const CellCoord Coords, int Margin = 0) const;
 

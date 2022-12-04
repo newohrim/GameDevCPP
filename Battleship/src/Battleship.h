@@ -28,6 +28,10 @@ public:
 		const CellCoord CoordOnBoard, 
 		Game* GameInstance);
 
+	void TakeDamageHandle();
+
+	uint8_t GetShipHealth() const { return m_ShipHealth; }
+
 	BattleshipStats const* GetShipStats() const { return m_ShipStats; }
 
 	CellCoord GetShipOnBoardCoords() const { return m_ShipOnBoardCoords; }
@@ -45,5 +49,7 @@ protected:
 
 private:
 	CellCoord m_ShipOnBoardCoords;
+
+	uint8_t m_ShipHealth;
 };
 

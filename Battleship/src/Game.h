@@ -16,7 +16,7 @@ class GameBoard;
 class PlaceableBattleshipButton;
 class SeaBattleSimpleAI;
 
-enum CurrentPlayersTurn 
+enum PlayerEnum 
 {
 	Player = 0,
 	Opponent
@@ -48,6 +48,8 @@ private:
 	void GenerateOutput();
 	void LoadData();
 	void UnloadData();
+	void GameOver(const PlayerEnum Winner);
+	void ResetGame();
 
 	void ResolveCollisions();
 	Ball2D* CreateBall();
@@ -65,7 +67,7 @@ private:
 
 	GameBoard* m_GameBoard_Player = nullptr;
 	GameBoard* m_GameBoard_Opponent = nullptr;
-	CurrentPlayersTurn m_PlayersTurn = CurrentPlayersTurn::Player;
+	PlayerEnum m_PlayersTurn = PlayerEnum::Player;
 	std::vector<BattleshipStats> m_ShipTamplates;
 	std::vector<PlaceableBattleshipButton*> m_ShipsButtons;
 	SeaBattleSimpleAI* m_OpponentAI;
