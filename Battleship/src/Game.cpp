@@ -601,12 +601,11 @@ void Game::PlacementStageClickHandle(const int Mouse_X, const int Mouse_Y)
 		{
 			if (!ShipButton->IsEmpty())
 			{
-				m_ChoosenShipTamplate = ShipButton;
-				m_PlacementShipOrientation = ShipOrientation::Horizontal;
+				// Unchoose ship tamplate if not null
+				UnchooseShipTamplate();
 
-				// Highlight selected ship button
-				ShipButton->GetSpriteComponent()->SetColorModifier({ 255, 255, 0, 255 });
-				RequestRedraw();
+				// Choose new one
+				ChooseShipTamplate(ShipButton);
 			}
 			return;
 		}
@@ -618,7 +617,6 @@ void Game::PlacementStageClickHandle(const int Mouse_X, const int Mouse_Y)
 		GameBoardDrawer* BoardDrawer = m_GameBoard_Player->GetBoardDrawer();
 		const CellCoord MouseOnBoardCoord_Player = BoardDrawer->
 			GetWorldToBoardPos(m_GameBoard_Player, Vector2(Mouse_X, Mouse_Y), 50.0f);
-		bool HasSpareShips = false;
 		if (m_GameBoard_Player->IsValidCoords(MouseOnBoardCoord_Player))
 		{
 			BoardCell& Cell = m_GameBoard_Player->GetCell(MouseOnBoardCoord_Player);
@@ -637,7 +635,8 @@ void Game::PlacementStageClickHandle(const int Mouse_X, const int Mouse_Y)
 				Ship->SetRotation(
 					m_GameBoard_Player->GetCorrectShipRotation(Ship));
 
-				// CHECK IF SPARE SHIPS LEFT
+				// Check if spare ships left to place
+				bool HasSpareShips = false;
 				for (PlaceableBattleshipButton* PlacementShip : m_ShipsButtons)
 				{
 					if (!PlacementShip->IsEmpty())
@@ -646,17 +645,36 @@ void Game::PlacementStageClickHandle(const int Mouse_X, const int Mouse_Y)
 						break;
 					}
 				}
+				if (!HasSpareShips)
+				{
+					FinishPlacementStage();
+				}
 			}
 		}
 
+		// Unchoose ship tamplate (null safe)
+		UnchooseShipTamplate();
+
+		RequestRedraw();
+	}
+}
+
+void Game::ChooseShipTamplate(PlaceableBattleshipButton* ShipButton)
+{
+	m_ChoosenShipTamplate = ShipButton;
+	m_PlacementShipOrientation = ShipOrientation::Horizontal;
+
+	// Highlight selected ship button
+	m_ChoosenShipTamplate->GetSpriteComponent()->SetColorModifier({ 255, 255, 0, 255 });
+	RequestRedraw();
+}
+
+void Game::UnchooseShipTamplate()
+{
+	if (m_ChoosenShipTamplate) 
+	{
 		m_ChoosenShipTamplate->GetSpriteComponent()->SetColorModifier({ 255, 255, 255, 255 });
 		m_ChoosenShipTamplate = nullptr;
-
-		if (!HasSpareShips)
-		{
-			FinishPlacementStage();
-		}
-
 		RequestRedraw();
 	}
 }

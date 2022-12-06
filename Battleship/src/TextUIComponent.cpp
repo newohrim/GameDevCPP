@@ -6,6 +6,7 @@
 TextUIComponent::TextUIComponent(TTF_Font* Font, Actor* ComponentOwner, int UpdateOrder)
 	: Component(ComponentOwner, UpdateOrder), m_Font(Font)
 {
+	m_TextTex = nullptr;
 	m_TextRect = SDL_Rect{ 0, 0, 100, 100 };
 	m_TextColor = SDL_Color{ 255, 255, 255 };
 	m_TextScale = 2.0f;
@@ -43,6 +44,9 @@ void TextUIComponent::SetTextScale(float TextScale)
 
 void TextUIComponent::DrawText(SDL_Renderer* Renderer)
 {
+	if (!m_TextTex)
+		return;
+
 	const SDL_Rect ScaledRect 
 	{
 		m_TextRect.x,

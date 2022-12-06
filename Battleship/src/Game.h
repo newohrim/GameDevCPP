@@ -110,6 +110,10 @@ private:
 
 	void PlacementStageClickHandle(const int Mouse_X, const int Mouse_Y);
 
+	void ChooseShipTamplate(PlaceableBattleshipButton* ShipButton);
+
+	void UnchooseShipTamplate();
+
 	void GameStageClickHandle(const int Mouse_X, const int Mouse_Y);
 
 	GameBoard* CreateAndPopulateGameboard();
