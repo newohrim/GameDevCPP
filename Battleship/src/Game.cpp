@@ -13,7 +13,8 @@
 #include "PlaceableBattleshipButton.h"
 #include "RectangleClickZone.h"
 #include "ai/SeaBattleSimpleAI.h"
-#include "TextUIComponent.h"
+#include "ui/UIInterface.h"
+#include "PlacementConfirmPanel.h"
 
 #include <iostream>
 
@@ -149,18 +150,18 @@ void Game::RemoveSprite(SpriteComponent* SpriteToRemove)
 	mSprites.erase(iter);
 }
 
-void Game::AddTextComponent(TextUIComponent* TextComp)
+void Game::AddUIItem(UIInterface * UIItem)
 {
-	m_TextComponents.push_back(TextComp);
+	m_UIItems.push_back(UIItem);
 }
 
-void Game::RemoveTextComponent(TextUIComponent* TextComp)
+void Game::RemoveUIItem(UIInterface * UIItem)
 {
-	auto iter = 
-		std::find(m_TextComponents.begin(), m_TextComponents.end(), TextComp);
-	if (iter != m_TextComponents.end()) 
+	const auto Iter =
+		std::find(m_UIItems.begin(), m_UIItems.end(), UIItem);
+	if (Iter != m_UIItems.end())
 	{
-		m_TextComponents.erase(iter);
+		m_UIItems.erase(Iter);
 	}
 }
 
@@ -236,6 +237,9 @@ void Game::ProcessInput()
 		}
 	}
 
+	ProvideUIWithInput_MouseOver(
+		Vector2{ (float)Mouse_X, (float)Mouse_Y });
+	// TODO: Replace with event driven
 	OnMouseOverHandle(Mouse_X, Mouse_Y);
 
 	SDL_Event event;
@@ -247,6 +251,9 @@ void Game::ProcessInput()
 				mIsRunning = false;
 				break;
 			case SDL_MOUSEBUTTONDOWN:
+				ProvideUIWithInput_MouseClick(
+					Vector2{ (float)Mouse_X, (float)Mouse_Y });
+				// TODO: Replace with event driven
 				OnMouseDownHandle(Mouse_X, Mouse_Y);
 				break;
 			case SDL_KEYDOWN:
@@ -339,9 +346,9 @@ void Game::GenerateOutput()
 		{
 			sprite->Draw(mRenderer);
 		}
-		for (TextUIComponent* text : m_TextComponents) 
+		for (UIInterface* UIItem : m_UIItems) 
 		{
-			text->DrawText(mRenderer);
+			UIItem->DrawUI(mRenderer);
 		}
 
 		SDL_RenderPresent(mRenderer);
@@ -428,6 +435,22 @@ void Game::ResetGame()
 
 	// Reload data and recreate entities
 	BeginGame();
+}
+
+void Game::ProvideUIWithInput_MouseClick(Vector2 MousePos)
+{
+	for (UIInterface* UIItem : m_UIItems) 
+	{
+		UIItem->ConsumeInput_MouseClick(MousePos);
+	}
+}
+
+void Game::ProvideUIWithInput_MouseOver(Vector2 MousePos)
+{
+	for (UIInterface* UIItem : m_UIItems)
+	{
+		UIItem->ConsumeInput_MouseOver(MousePos);
+	}
 }
 
 void Game::ResolveCollisions()
@@ -560,8 +583,8 @@ void Game::CreatePlacementPanel(const std::vector<BattleshipStats>& Tamplates)
 		m_ShipsButtons.back()->SetRotation(Math::Pi / 2.0f);
 		const Vector2 Pos = 
 			m_ShipsButtons.back()->GetPosition() + Vector2{ 150.0f, -25.0f };
-		m_ShipsButtons.back()->GetTextComponent()->
-			SetTextPosition((int)Pos.x, (int)Pos.y);
+		//m_ShipsButtons.back()->GetTextComponent()->
+		//	SetTextPosition((int)Pos.x, (int)Pos.y);
 	}
 
 	RequestRedraw();
@@ -624,6 +647,13 @@ void Game::PlacementStageClickHandle(const int Mouse_X, const int Mouse_Y)
 				MouseOnBoardCoord_Player, m_ChoosenShipTamplate->GetShipStats(), &m_PlacementShipOrientation) &&
 				m_ChoosenShipTamplate->DecrementShipsCount())
 			{
+				// Create confirm panel
+				if (!m_CreatedConfirmPanel) 
+				{
+					m_CreatedConfirmPanel = new PlacementConfirmPanel(&Game::ShipPlacementHandle, this);
+				}
+				m_CreatedConfirmPanel->SetPosition(Vector2(Mouse_X, Mouse_Y));
+
 				// Create ship
 				Battleship* Ship =
 					new Battleship(m_ChoosenShipTamplate->GetShipStats(), m_PlacementShipOrientation, MouseOnBoardCoord_Player, this);
@@ -717,6 +747,15 @@ void Game::GameStageClickHandle(const int Mouse_X, const int Mouse_Y)
 		}
 		m_PlayersTurn = PlayerEnum::Player;
 		RequestRedraw();
+	}
+}
+
+void Game::ShipPlacementHandle(bool Confirmed)
+{
+	if (m_CreatedConfirmPanel) 
+	{
+		delete(m_CreatedConfirmPanel);
+		m_CreatedConfirmPanel = nullptr;
 	}
 }
 

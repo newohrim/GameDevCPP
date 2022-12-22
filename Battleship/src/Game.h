@@ -12,10 +12,13 @@ struct SDL_Window;
 struct SDL_Renderer;
 struct SDL_Texture;
 
+class UIInterface;
+
 class Ball2D;
 class GameBoard;
 class PlaceableBattleshipButton;
 class SeaBattleSimpleAI;
+class PlacementConfirmPanel;
 
 enum PlayerEnum 
 {
@@ -37,8 +40,8 @@ public:
 	void AddSprite(class SpriteComponent* SpriteToAdd);
 	void RemoveSprite(class SpriteComponent* SpriteToRemove);
 
-	void AddTextComponent(class TextUIComponent* TextComp);
-	void RemoveTextComponent(class TextUIComponent* TextComp);
+	void AddUIItem(UIInterface * UIItem);
+	void RemoveUIItem(UIInterface * UIItem);
 
 	SDL_Texture* GetTexture(const std::string& fileName);
 
@@ -59,6 +62,9 @@ private:
 	void GameOver(const PlayerEnum Winner);
 	void ResetGame();
 
+	void ProvideUIWithInput_MouseClick(Vector2 MousePos);
+	void ProvideUIWithInput_MouseOver(Vector2 MousePos);
+
 	void ResolveCollisions();
 	Ball2D* CreateBall();
 
@@ -66,7 +72,7 @@ private:
 	std::vector<class Actor*> mActors;
 	std::vector<class Actor*> mPendingActors;
 	std::vector<class SpriteComponent*> mSprites;
-	std::vector<class TextUIComponent*> m_TextComponents;
+	std::vector<UIInterface*> m_UIItems;
 
 	SDL_Window* mWindow = nullptr;
 	SDL_Renderer* mRenderer;
@@ -86,6 +92,7 @@ private:
 	PlaceableBattleshipButton* m_ChoosenShipTamplate = nullptr;
 	ShipOrientation m_PlacementShipOrientation = ShipOrientation::Horizontal;
 	TTF_Font* m_MainTextFont = nullptr;
+	PlacementConfirmPanel* m_CreatedConfirmPanel = nullptr;
 	
 	std::string BallTexturePaths[3] = { 
 		"Assets/redball.png", 
@@ -115,6 +122,8 @@ private:
 	void UnchooseShipTamplate();
 
 	void GameStageClickHandle(const int Mouse_X, const int Mouse_Y);
+
+	void ShipPlacementHandle(bool Confirmed);
 
 	GameBoard* CreateAndPopulateGameboard();
 };

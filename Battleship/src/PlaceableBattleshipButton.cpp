@@ -22,8 +22,9 @@ PlaceableBattleshipButton::PlaceableBattleshipButton(
 	m_TextComponent = new TextUIComponent(TextFont, this);
 	const std::string Text("x" + std::to_string(m_ShipsLeft));
 	m_TextComponent->SetText(Text);
-	m_TextComponent->SetTextScale(1.0f);
+	m_TextComponent->SetRectScale(1.0f);
 	m_TextComponent->SetTextColor({ 255, 255, 255 });
+	m_TextComponent->SetRectPosition(120, -20);
 }
 
 bool PlaceableBattleshipButton::DecrementShipsCount()

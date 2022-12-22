@@ -163,6 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ai\SeaBattleSimpleAI.cpp" />
+    <ClCompile Include="src\PlacementConfirmPanel.cpp" />
     <ClCompile Include="src\RectangleClickZone.cpp" />
     <ClCompile Include="src\PlaceableBattleshipButton.cpp" />
     <ClCompile Include="src\gameboard\SimpleGBD.cpp" />
@@ -182,9 +183,15 @@
     <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\SpriteComponent.cpp" />
     <ClCompile Include="src\TextUIComponent.cpp" />
+    <ClCompile Include="src\ui\UIButtonComponent.cpp" />
+    <ClCompile Include="src\ui\UIComponent.cpp" />
+    <ClCompile Include="src\ui\UIContainerActor.cpp" />
+    <ClCompile Include="src\ui\UIImageComponent.cpp" />
+    <ClCompile Include="src\ui\UIPanelComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ai\SeaBattleSimpleAI.h" />
+    <ClInclude Include="src\PlacementConfirmPanel.h" />
     <ClInclude Include="src\RectangleClickZone.h" />
     <ClInclude Include="src\PlaceableBattleshipButton.h" />
     <ClInclude Include="src\gameboard\GameBoardDrawer.h" />
@@ -205,6 +212,12 @@
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\SpriteComponent.h" />
     <ClInclude Include="src\TextUIComponent.h" />
+    <ClInclude Include="src\ui\UIButtonComponent.h" />
+    <ClInclude Include="src\ui\UIComponent.h" />
+    <ClInclude Include="src\ui\UIContainerActor.h" />
+    <ClInclude Include="src\ui\UIImageComponent.h" />
+    <ClInclude Include="src\ui\UIInterface.h" />
+    <ClInclude Include="src\ui\UIPanelComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libpng16-16.dll" />
