@@ -38,12 +38,14 @@ public:
 
 	ShipOrientation GetShipOrientation() const { return m_ShipOrientation; }
 
+	friend void GameBoard::SetShipOrientation(Battleship* Ship, ShipOrientation Orientation);
+
 	SpriteComponent* GetSpriteComponent() const { return m_SpriteComponent; }
 
 protected:
 	BattleshipStats const* const m_ShipStats;
 
-	const ShipOrientation m_ShipOrientation;
+	ShipOrientation m_ShipOrientation;
 
 	SpriteComponent* m_SpriteComponent;
 

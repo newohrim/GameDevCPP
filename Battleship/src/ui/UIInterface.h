@@ -11,8 +11,8 @@ public:
 
 	virtual bool IsPointInside(Vector2 Point) = 0;
 
-	virtual void ConsumeInput_MouseClick(Vector2 MousePos) = 0;
+	virtual bool ConsumeInput_MouseClick(Vector2 MousePos) = 0;
 
-	virtual void ConsumeInput_MouseOver(Vector2 MousePos) = 0;
+	virtual bool ConsumeInput_MouseOver(Vector2 MousePos) = 0;
 };
 

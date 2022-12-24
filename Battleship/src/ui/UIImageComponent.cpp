@@ -30,6 +30,7 @@ void UIImageComponent::DrawUI(SDL_Renderer* Renderer)
 	{
 		SDL_SetRenderDrawBlendMode(Renderer, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 	}
+	SDL_SetTextureAlphaMod(m_Texture, (uint8_t)(m_ImageOpacity * 255));
 	SDL_RenderCopy(Renderer, m_Texture, nullptr, &ScaledRect);
 
 	SDL_SetRenderDrawBlendMode(Renderer, CachedBlendMode);

@@ -25,9 +25,13 @@ public:
 		m_OnClickHandler.m_Callback = std::bind(Handler, Obj, this);
 	}
 
-	virtual void ConsumeInput_MouseClick(Vector2 MousePos) override;
+	virtual bool ConsumeInput_MouseClick(Vector2 MousePos) override;
+
+	virtual bool ConsumeInput_MouseOver(Vector2 MousePos) override;
 
 private:
 	UIButton::Callback m_OnClickHandler;
+
+	bool m_IsMouseOver = false;
 };
 

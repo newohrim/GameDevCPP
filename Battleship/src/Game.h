@@ -19,6 +19,7 @@ class GameBoard;
 class PlaceableBattleshipButton;
 class SeaBattleSimpleAI;
 class PlacementConfirmPanel;
+class SpriteActor;
 
 enum PlayerEnum 
 {
@@ -53,6 +54,7 @@ public:
 
 private:
 	void ProcessInput();
+	void SwitchShipOrientation();
 	void UpdateGame();
 	void GenerateOutput();
 	void LoadData();
@@ -62,8 +64,8 @@ private:
 	void GameOver(const PlayerEnum Winner);
 	void ResetGame();
 
-	void ProvideUIWithInput_MouseClick(Vector2 MousePos);
-	void ProvideUIWithInput_MouseOver(Vector2 MousePos);
+	bool ProvideUIWithInput_MouseClick(Vector2 MousePos);
+	bool ProvideUIWithInput_MouseOver(Vector2 MousePos);
 
 	void ResolveCollisions();
 	Ball2D* CreateBall();
@@ -93,6 +95,7 @@ private:
 	ShipOrientation m_PlacementShipOrientation = ShipOrientation::Horizontal;
 	TTF_Font* m_MainTextFont = nullptr;
 	PlacementConfirmPanel* m_CreatedConfirmPanel = nullptr;
+	Battleship* m_GhostShip = nullptr;
 	
 	std::string BallTexturePaths[3] = { 
 		"Assets/redball.png", 
@@ -117,6 +120,10 @@ private:
 
 	void PlacementStageClickHandle(const int Mouse_X, const int Mouse_Y);
 
+	void CreateConfirmPanel(const int& Mouse_X, const int& Mouse_Y);
+
+	Battleship* CreateShip(const CellCoord& MouseOnBoardCoord_Player);
+
 	void ChooseShipTamplate(PlaceableBattleshipButton* ShipButton);
 
 	void UnchooseShipTamplate();
@@ -124,6 +131,10 @@ private:
 	void GameStageClickHandle(const int Mouse_X, const int Mouse_Y);
 
 	void ShipPlacementHandle(bool Confirmed);
+
+	void DestroyPlacementConfirmPanel();
+
+	void DestroyGhostShip();
 
 	GameBoard* CreateAndPopulateGameboard();
 };

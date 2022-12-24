@@ -237,10 +237,12 @@ void Game::ProcessInput()
 		}
 	}
 
-	ProvideUIWithInput_MouseOver(
-		Vector2{ (float)Mouse_X, (float)Mouse_Y });
-	// TODO: Replace with event driven
-	OnMouseOverHandle(Mouse_X, Mouse_Y);
+	if (!ProvideUIWithInput_MouseOver(
+		Vector2{ (float)Mouse_X, (float)Mouse_Y })) 
+	{
+		// TODO: Replace with event driven
+		OnMouseOverHandle(Mouse_X, Mouse_Y);
+	}
 
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) 
@@ -251,17 +253,18 @@ void Game::ProcessInput()
 				mIsRunning = false;
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				ProvideUIWithInput_MouseClick(
-					Vector2{ (float)Mouse_X, (float)Mouse_Y });
-				// TODO: Replace with event driven
-				OnMouseDownHandle(Mouse_X, Mouse_Y);
+				if (!ProvideUIWithInput_MouseClick(
+					Vector2{ (float)Mouse_X, (float)Mouse_Y })) 
+				{
+					// TODO: Replace with event driven
+					OnMouseDownHandle(Mouse_X, Mouse_Y);
+				}
 				break;
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym) 
 				{
 					case SDLK_r:
-						m_PlacementShipOrientation =
-							static_cast<ShipOrientation>((m_PlacementShipOrientation + 1) % 2);
+						SwitchShipOrientation();
 						break;
 					default:
 						break;
@@ -276,6 +279,25 @@ void Game::ProcessInput()
 	if (state[SDL_SCANCODE_ESCAPE])
 	{
 		mIsRunning = false;
+	}
+}
+
+void Game::SwitchShipOrientation()
+{
+	m_PlacementShipOrientation =
+		static_cast<ShipOrientation>((m_PlacementShipOrientation + 1) % 2);
+
+	if (m_GhostShip) 
+	{
+		const bool IsAllowedToRotate = m_GameBoard_Player->IsAvailableForShip(
+			m_GhostShip->GetShipOnBoardCoords(), 
+			m_GhostShip->GetShipStats(), 
+			&m_PlacementShipOrientation);
+		if (IsAllowedToRotate) 
+		{
+			m_GameBoard_Player->SetShipOrientation(m_GhostShip, m_PlacementShipOrientation);
+			RequestRedraw();
+		}
 	}
 }
 
@@ -437,20 +459,26 @@ void Game::ResetGame()
 	BeginGame();
 }
 
-void Game::ProvideUIWithInput_MouseClick(Vector2 MousePos)
+bool Game::ProvideUIWithInput_MouseClick(Vector2 MousePos)
 {
+	bool WasUIInteracted = false;
 	for (UIInterface* UIItem : m_UIItems) 
 	{
-		UIItem->ConsumeInput_MouseClick(MousePos);
+		WasUIInteracted |= UIItem->ConsumeInput_MouseClick(MousePos);
 	}
+
+	return WasUIInteracted;
 }
 
-void Game::ProvideUIWithInput_MouseOver(Vector2 MousePos)
+bool Game::ProvideUIWithInput_MouseOver(Vector2 MousePos)
 {
+	bool WasUIInteracted = false;
 	for (UIInterface* UIItem : m_UIItems)
 	{
-		UIItem->ConsumeInput_MouseOver(MousePos);
+		WasUIInteracted |= UIItem->ConsumeInput_MouseOver(MousePos);
 	}
+
+	return WasUIInteracted;
 }
 
 void Game::ResolveCollisions()
@@ -618,9 +646,14 @@ void Game::SwitchGameboards()
 
 void Game::PlacementStageClickHandle(const int Mouse_X, const int Mouse_Y)
 {
+	// Null safe calls
+	DestroyGhostShip();
+	DestroyPlacementConfirmPanel();
+
 	for (PlaceableBattleshipButton* ShipButton : m_ShipsButtons)
 	{
-		if (ShipButton->GetRectangleClickZone()->IsPointInsideRect(Vector2(Mouse_X, Mouse_Y)))
+		if (ShipButton->GetRectangleClickZone()->
+			IsPointInsideRect(Vector2(Mouse_X, Mouse_Y)))
 		{
 			if (!ShipButton->IsEmpty())
 			{
@@ -645,48 +678,41 @@ void Game::PlacementStageClickHandle(const int Mouse_X, const int Mouse_Y)
 			BoardCell& Cell = m_GameBoard_Player->GetCell(MouseOnBoardCoord_Player);
 			if (m_GameBoard_Player->IsAvailableForShip(
 				MouseOnBoardCoord_Player, m_ChoosenShipTamplate->GetShipStats(), &m_PlacementShipOrientation) &&
-				m_ChoosenShipTamplate->DecrementShipsCount())
+				!m_ChoosenShipTamplate->IsEmpty())
 			{
 				// Create confirm panel
-				if (!m_CreatedConfirmPanel) 
-				{
-					m_CreatedConfirmPanel = new PlacementConfirmPanel(&Game::ShipPlacementHandle, this);
-				}
-				m_CreatedConfirmPanel->SetPosition(Vector2(Mouse_X, Mouse_Y));
+				CreateConfirmPanel(Mouse_X, Mouse_Y);
 
-				// Create ship
-				Battleship* Ship =
-					new Battleship(m_ChoosenShipTamplate->GetShipStats(), m_PlacementShipOrientation, MouseOnBoardCoord_Player, this);
-				m_GameBoard_Player->AddShip(
-					Ship,
-					MouseOnBoardCoord_Player);
-				Ship->SetPosition(
-					m_GameBoard_Player->GetCorrectShipPosition(Ship, 50.0f));
-				Ship->SetRotation(
-					m_GameBoard_Player->GetCorrectShipRotation(Ship));
-
-				// Check if spare ships left to place
-				bool HasSpareShips = false;
-				for (PlaceableBattleshipButton* PlacementShip : m_ShipsButtons)
-				{
-					if (!PlacementShip->IsEmpty())
-					{
-						HasSpareShips = true;
-						break;
-					}
-				}
-				if (!HasSpareShips)
-				{
-					FinishPlacementStage();
-				}
+				// Create ghost ship (not linked to gameboard)
+				m_GhostShip = CreateShip(MouseOnBoardCoord_Player);
+				m_GhostShip->GetSpriteComponent()->SetAlphaModifier(0.5f);
 			}
 		}
 
-		// Unchoose ship tamplate (null safe)
-		UnchooseShipTamplate();
-
 		RequestRedraw();
 	}
+}
+
+void Game::CreateConfirmPanel(const int& Mouse_X, const int& Mouse_Y)
+{
+	if (!m_CreatedConfirmPanel)
+	{
+		m_CreatedConfirmPanel = new PlacementConfirmPanel(
+			&Game::ShipPlacementHandle, &Game::SwitchShipOrientation, this);
+	}
+	m_CreatedConfirmPanel->SetPosition(Vector2(Mouse_X, Mouse_Y));
+}
+
+Battleship* Game::CreateShip(const CellCoord& MouseOnBoardCoord_Player)
+{
+	Battleship* Ship =
+		new Battleship(m_ChoosenShipTamplate->GetShipStats(), m_PlacementShipOrientation, MouseOnBoardCoord_Player, this);
+	Ship->SetPosition(
+		m_GameBoard_Player->GetCorrectShipPosition(Ship, 50.0f));
+	Ship->SetRotation(
+		m_GameBoard_Player->GetCorrectShipRotation(Ship));
+
+	return Ship;
 }
 
 void Game::ChooseShipTamplate(PlaceableBattleshipButton* ShipButton)
@@ -695,7 +721,8 @@ void Game::ChooseShipTamplate(PlaceableBattleshipButton* ShipButton)
 	m_PlacementShipOrientation = ShipOrientation::Horizontal;
 
 	// Highlight selected ship button
-	m_ChoosenShipTamplate->GetSpriteComponent()->SetColorModifier({ 255, 255, 0, 255 });
+	m_ChoosenShipTamplate->GetSpriteComponent()->
+		SetColorModifier({ 255, 255, 0, 255 });
 	RequestRedraw();
 }
 
@@ -703,7 +730,8 @@ void Game::UnchooseShipTamplate()
 {
 	if (m_ChoosenShipTamplate) 
 	{
-		m_ChoosenShipTamplate->GetSpriteComponent()->SetColorModifier({ 255, 255, 255, 255 });
+		m_ChoosenShipTamplate->GetSpriteComponent()->
+			SetColorModifier({ 255, 255, 255, 255 });
 		m_ChoosenShipTamplate = nullptr;
 		RequestRedraw();
 	}
@@ -752,10 +780,66 @@ void Game::GameStageClickHandle(const int Mouse_X, const int Mouse_Y)
 
 void Game::ShipPlacementHandle(bool Confirmed)
 {
+	if (Confirmed && m_GhostShip && m_ChoosenShipTamplate && 
+		m_ChoosenShipTamplate->DecrementShipsCount()) 
+	{
+		// Reset ship's sprite opacity
+		m_GhostShip->GetSpriteComponent()->SetAlphaModifier(1.0f);
+
+		// Add ship on board
+		m_GameBoard_Player->AddShip(
+			m_GhostShip,
+			m_GhostShip->GetShipOnBoardCoords());
+
+		// Reset placement state
+		m_GhostShip = nullptr;
+
+		// TODO: Extract to function
+		// Check if spare ships left to place
+		bool HasSpareShips = false;
+		for (PlaceableBattleshipButton* PlacementShip : m_ShipsButtons)
+		{
+			if (!PlacementShip->IsEmpty())
+			{
+				HasSpareShips = true;
+				break;
+			}
+		}
+		if (!HasSpareShips)
+		{
+			FinishPlacementStage();
+		}
+	}
+	else if (!Confirmed) 
+	{
+		// Null safe
+		DestroyGhostShip();
+	}
+
+	// Null safe
+	DestroyPlacementConfirmPanel();
+
+	// Unchoose ship tamplate (null safe)
+	UnchooseShipTamplate();
+
+	RequestRedraw();
+}
+
+void Game::DestroyPlacementConfirmPanel()
+{
 	if (m_CreatedConfirmPanel) 
 	{
-		delete(m_CreatedConfirmPanel);
+		m_CreatedConfirmPanel->DestroyDeferred();
 		m_CreatedConfirmPanel = nullptr;
+	}
+}
+
+void Game::DestroyGhostShip()
+{
+	if (m_GhostShip) 
+	{
+		m_GhostShip->DestroyDeferred();
+		m_GhostShip = nullptr;
 	}
 }
 

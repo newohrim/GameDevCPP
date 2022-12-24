@@ -31,6 +31,7 @@ GameBoard::~GameBoard()
 	delete BoardDrawer;
 }
 
+// TODO: Remove Pos parameter
 bool GameBoard::AddShip(Battleship* Ship, const CellCoord Pos)
 {
 	if (!IsValidCoords(Pos) || !IsAvailableForShip(Pos, Ship))
@@ -155,6 +156,14 @@ std::vector<CellCoord> GameBoard::GetCornersNeighborhood(const CellCoord Coords,
 	}
 
 	return Result;
+}
+
+void GameBoard::SetShipOrientation(Battleship* Ship, ShipOrientation Orientation)
+{
+	Ship->m_ShipOrientation = Orientation;
+	// TODO: Make CellSize var in Board drawer
+	Ship->SetPosition(GetCorrectShipPosition(Ship, 50.0f));
+	Ship->SetRotation(GetCorrectShipRotation(Ship));
 }
 
 bool GameBoard::CheckGameOverCondition() const

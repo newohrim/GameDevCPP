@@ -65,18 +65,24 @@ bool UIContainerActor::IsPointInside(Vector2 Point)
 	return false;
 }
 
-void UIContainerActor::ConsumeInput_MouseClick(Vector2 MousePos)
+bool UIContainerActor::ConsumeInput_MouseClick(Vector2 MousePos)
 {
+	bool WasUIInteracted = false;
 	for (UIComponent* Comp : m_UIComponents) 
 	{
-		Comp->ConsumeInput_MouseClick(MousePos);
+		WasUIInteracted |= Comp->ConsumeInput_MouseClick(MousePos);
 	}
+
+	return WasUIInteracted;
 }
 
-void UIContainerActor::ConsumeInput_MouseOver(Vector2 MousePos)
+bool UIContainerActor::ConsumeInput_MouseOver(Vector2 MousePos)
 {
+	bool WasUIInteracted = false;
 	for (UIComponent* Comp : m_UIComponents)
 	{
-		Comp->ConsumeInput_MouseOver(MousePos);
+		WasUIInteracted |= Comp->ConsumeInput_MouseOver(MousePos);
 	}
+
+	return WasUIInteracted;
 }

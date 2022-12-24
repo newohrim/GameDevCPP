@@ -24,6 +24,7 @@ public:
 	void RemoveComponent(class Component* ComponentToRemove);
 
 	ActorState GetState() const { return mState; }
+	void DestroyDeferred() { mState = ActorState::EDead; }
 	Game* GetGame() const { return GameInstance; }
 	float GetScale() const { return mScale; }
 	void SetScale(const float Scale) { mScale = Scale; }

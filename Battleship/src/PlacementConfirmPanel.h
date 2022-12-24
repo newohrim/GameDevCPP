@@ -8,19 +8,31 @@ using ConfirmationHandler = void (*)(bool);
 
 namespace ConfirmPanel 
 {
-	struct Callback 
+	struct CallbackBool
 	{
 		std::function<void(bool)> m_Callback;
+	};
+
+	struct Callback 
+	{
+		std::function<void()> m_Callback;
 	};
 }
 
 class PlacementConfirmPanel : public UIContainerActor
 {
 public:
-	PlacementConfirmPanel(void(Game::*Handler)(bool), Game* GameInstance);
+	PlacementConfirmPanel(
+		void(Game::*PlacementHandler)(bool), void(Game::*RotateHandler)(), Game* GameInstance);
 
 private:
-	ConfirmPanel::Callback m_ConfirmPlacementHandle;
+	ConfirmPanel::CallbackBool m_ConfirmPlacementHandle;
+
+	ConfirmPanel::Callback m_RotateShipHandle;
 
 	void ConfirmPlacement_Handle(UIButtonComponent* Button);
+
+	void CancelPlacement_Handle(UIButtonComponent* Button);
+
+	void RotateShip_Handle(UIButtonComponent* Button);
 };

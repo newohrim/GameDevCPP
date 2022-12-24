@@ -58,10 +58,10 @@ bool UIComponent::IsPointInside(Vector2 Point)
 	const Vector2 OwnerPosition = mOwner->GetPosition();
 	const SDL_Rect Rect =
 	{
-		OwnerPosition.x,
-		OwnerPosition.y,
-		m_DrawRect.w,
-		m_DrawRect.h
+		OwnerPosition.x + m_DrawRect.x,
+		OwnerPosition.y + m_DrawRect.y,
+		m_DrawRect.w * m_DrawScale,
+		m_DrawRect.h * m_DrawScale
 	};
 
 	return SDL_PointInRect(&SPoint, &Rect);

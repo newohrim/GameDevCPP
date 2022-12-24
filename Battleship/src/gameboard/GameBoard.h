@@ -142,6 +142,8 @@ public:
 
 	const std::vector<Battleship*>& GetShipsOnBoard() const { return m_Ships; }
 
+	void SetShipOrientation(Battleship* Ship, ShipOrientation Orientation);
+
 	bool CheckGameOverCondition() const;
 
 	std::vector<CellCoord> GetVonNeumannNeighborhood(const CellCoord Coords, int Margin = 0) const;
