@@ -3,15 +3,15 @@
 #include "Actor.h"
 #include "Game.h"
 
-TextUIComponent::TextUIComponent(TTF_Font* Font, UIContainerActor* ComponentOwner, int UpdateOrder)
-	:UIComponent(ComponentOwner, UpdateOrder), m_Font(Font)
+TextUIComponent::TextUIComponent(TTF_Font* Font, UIContainerActor* ComponentOwner, int DrawOrder)
+	:UIComponent(ComponentOwner, DrawOrder), m_Font(Font)
 {
 	m_TextTex = nullptr;
 	m_TextColor = SDL_Color{ 255, 255, 255 };
 }
 
-TextUIComponent::TextUIComponent(TTF_Font* Font, Actor* ComponentOwner, int UpdateOrder) 
-	: UIComponent(ComponentOwner, UpdateOrder), m_Font(Font)
+TextUIComponent::TextUIComponent(TTF_Font* Font, Actor* ComponentOwner, int DrawOrder)
+	: UIComponent(ComponentOwner, DrawOrder), m_Font(Font)
 {
 	m_TextTex = nullptr;
 	m_TextColor = SDL_Color{ 255, 255, 255 };

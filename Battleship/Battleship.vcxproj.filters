@@ -93,10 +93,10 @@
     <ClCompile Include="src\ui\UIImageComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SpriteActor.cpp">
+    <ClCompile Include="src\GameOverPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameOverPanel.cpp">
+    <ClCompile Include="src\ui\TextUIData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -185,10 +185,10 @@
     <ClInclude Include="src\ui\UIImageComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\SpriteActor.h">
+    <ClInclude Include="src\GameOverPanel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameOverPanel.h">
+    <ClInclude Include="src\ui\TextUIData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

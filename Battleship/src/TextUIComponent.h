@@ -8,9 +8,9 @@
 class TextUIComponent : public UIComponent
 {
 public:
-	TextUIComponent(TTF_Font* Font, UIContainerActor* ComponentOwner, int UpdateOrder = 100);
+	TextUIComponent(TTF_Font* Font, UIContainerActor* ComponentOwner, int DrawOrder = 100);
 
-	TextUIComponent(TTF_Font* Font, Actor* ComponentOwner, int UpdateOrder = 100);
+	TextUIComponent(TTF_Font* Font, Actor* ComponentOwner, int DrawOrder = 100);
 
 	void SetText(const std::string& Text);
 
@@ -19,6 +19,7 @@ public:
 	virtual void DrawUI(SDL_Renderer* Renderer) override;
 
 private:
+	// Replace vars with TextUIData
 	TTF_Font* m_Font;
 
 	SDL_Texture* m_TextTex;

@@ -7,9 +7,12 @@ UIImageComponent::UIImageComponent(
 	SDL_Texture* Texture, UIContainerActor* UIContainer, int DrawOrder) 
 	: UIComponent(UIContainer, DrawOrder), m_Texture(Texture)
 {
-	int ImageWidth, ImageHeight;
-	SDL_QueryTexture(Texture, nullptr, nullptr, &ImageWidth, &ImageHeight);
-	SetRectDimension(ImageWidth, ImageHeight);
+	if (Texture) 
+	{
+		int ImageWidth, ImageHeight;
+		SDL_QueryTexture(Texture, nullptr, nullptr, &ImageWidth, &ImageHeight);
+		SetRectDimension(ImageWidth, ImageHeight);
+	}
 }
 
 void UIImageComponent::DrawUI(SDL_Renderer* Renderer)

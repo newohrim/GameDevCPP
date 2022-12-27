@@ -15,6 +15,7 @@
 #include "ai/SeaBattleSimpleAI.h"
 #include "ui/UIInterface.h"
 #include "PlacementConfirmPanel.h"
+#include "GameOverPanel.h"
 
 #include <iostream>
 
@@ -390,6 +391,12 @@ void Game::LoadData()
 	BeginGame();
 }
 
+void Game::CreateGameOverPanel(PlayerEnum Winner)
+{
+	GameOverPanel* Temp = new GameOverPanel(m_MainTextFont, Winner, this);
+	Temp->SetPosition(Vector2{ 1280 / 2 - 200, 720 / 2 - 100 });
+}
+
 void Game::UnloadData()
 {
 	delete m_GameBoard_Player;
@@ -438,7 +445,8 @@ void Game::GameOver(const PlayerEnum Winner)
 		std::cout << "Opponent won." << '\n';
 	}
 
-	ResetGame();
+	//ResetGame();
+	CreateGameOverPanel(Winner);
 	RequestRedraw();
 }
 
@@ -454,6 +462,8 @@ void Game::ResetGame()
 
 	// Destroy panel if still exists
 	DestroyPlacementPanel();
+
+	m_IsPlacementStage = false;
 
 	// Reload data and recreate entities
 	BeginGame();
@@ -586,6 +596,7 @@ void Game::FinishPlacementStage()
 		return;
 	}
 
+	UnchooseShipTamplate();
 	DestroyPlacementPanel();
 	m_IsPlacementStage = false;
 

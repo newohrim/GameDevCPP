@@ -182,7 +182,6 @@
     <ClCompile Include="src\Math.cpp" />
     <ClCompile Include="src\MoveConstantComponent.cpp" />
     <ClCompile Include="src\Random.cpp" />
-    <ClCompile Include="src\SpriteActor.cpp" />
     <ClCompile Include="src\SpriteComponent.cpp" />
     <ClCompile Include="src\TextUIComponent.cpp" />
     <ClCompile Include="src\ui\UIButtonComponent.cpp" />
@@ -190,6 +189,7 @@
     <ClCompile Include="src\ui\UIContainerActor.cpp" />
     <ClCompile Include="src\ui\UIImageComponent.cpp" />
     <ClCompile Include="src\ui\UIPanelComponent.cpp" />
+    <ClCompile Include="src\ui\TextUIData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ai\SeaBattleSimpleAI.h" />
@@ -213,7 +213,6 @@
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\MoveConstantComponent.h" />
     <ClInclude Include="src\Random.h" />
-    <ClInclude Include="src\SpriteActor.h" />
     <ClInclude Include="src\SpriteComponent.h" />
     <ClInclude Include="src\TextUIComponent.h" />
     <ClInclude Include="src\ui\UIButtonComponent.h" />
@@ -222,6 +221,7 @@
     <ClInclude Include="src\ui\UIImageComponent.h" />
     <ClInclude Include="src\ui\UIInterface.h" />
     <ClInclude Include="src\ui\UIPanelComponent.h" />
+    <ClInclude Include="src\ui\TextUIData.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libpng16-16.dll" />

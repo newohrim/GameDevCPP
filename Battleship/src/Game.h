@@ -34,6 +34,7 @@ public:
 	bool Initialize();
 	void RunLoop();
 	void Shutdown();
+	void ResetGame();
 
 	void AddActor(class Actor* ActorToAdd);
 	void RemoveActor(class Actor* ActorToRemove);
@@ -58,11 +59,11 @@ private:
 	void UpdateGame();
 	void GenerateOutput();
 	void LoadData();
+	void CreateGameOverPanel(PlayerEnum Winner);
 	void UnloadData();
 
 	void BeginGame();
 	void GameOver(const PlayerEnum Winner);
-	void ResetGame();
 
 	bool ProvideUIWithInput_MouseClick(Vector2 MousePos);
 	bool ProvideUIWithInput_MouseOver(Vector2 MousePos);
