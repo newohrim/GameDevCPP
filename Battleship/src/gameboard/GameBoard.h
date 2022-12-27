@@ -3,6 +3,7 @@
 #include <vector>
 //#include "../Battleship.h"
 #include "../Math.h"
+#include "SDL_ttf.h"
 
 class BoardCell;
 using GridRow = std::vector<BoardCell>;
@@ -98,7 +99,7 @@ private:
 class GameBoard
 {
 public:
-	GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* GameInstance);
+	GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* GameInstance, TTF_Font* Font);
 
 	~GameBoard();
 

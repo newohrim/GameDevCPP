@@ -429,7 +429,9 @@ void Game::BeginGame()
 		{ GetTexture("Assets/ships/submarine.png"), 3, 3 },
 		{ GetTexture("Assets/ships/destroyer.png"), 2, 3 }
 	};
-	m_GameBoard_Player = new GameBoard(10, 10, this);
+	m_GameBoard_Player = new GameBoard(10, 10, this, m_MainTextFont);
+	m_GameBoard_Player->GetBoardDrawer()->SetBoardPosition(
+		Vector2{ 50.0f, 50.0f }, m_GameBoard_Player, 50.0f);
 	m_OpponentAI = new SeaBattleSimpleAI(m_GameBoard_Player, this);
 	StartPlacementStage(m_ShipTamplates);
 }
@@ -602,7 +604,8 @@ void Game::FinishPlacementStage()
 
 	// TODO: Replace opponents board creation to load game data
 	m_GameBoard_Opponent = CreateAndPopulateGameboard();
-	m_GameBoard_Opponent->GetBoardDrawer()->SetBoardPosition(Vector2{ 50.0f * 10 + 100.0f, 0.0f }, m_GameBoard_Opponent, 50.0f);
+	m_GameBoard_Opponent->GetBoardDrawer()->SetBoardPosition(
+		Vector2{ 50.0f * 12 + 100.0f, 50.0f }, m_GameBoard_Opponent, 50.0f);
 	m_GameBoard_Opponent->GetBoardDrawer()->SetShipsVisability(false, m_GameBoard_Opponent);
 	m_PlayersTurn = PlayerEnum::Player;
 	//SwitchGameboards();
@@ -610,8 +613,8 @@ void Game::FinishPlacementStage()
 
 void Game::CreatePlacementPanel(const std::vector<BattleshipStats>& Tamplates)
 {
-	constexpr float PlaceableShipsPanel_X = 50.0f * 12.5f;
-	float PlaceableShipsPanel_Y = 0.0f;
+	constexpr float PlaceableShipsPanel_X = 50.0f * 13.5f;
+	float PlaceableShipsPanel_Y = 50.0f / 2.0f;
 	for (BattleshipStats& ShipTamplate : m_ShipTamplates)
 	{
 		m_ShipsButtons.push_back(new PlaceableBattleshipButton(
@@ -862,7 +865,7 @@ GameBoard* Game::CreateAndPopulateGameboard()
 		ShipsToSpawn.insert(
 			ShipsToSpawn.end(), ShipTamplate.m_ShipsBeginCount, &ShipTamplate);
 	}
-	GameBoard* ResultGB = new GameBoard(10, 10, this);
+	GameBoard* ResultGB = new GameBoard(10, 10, this, m_MainTextFont);
 	ResultGB->GetBoardPopulator()->
 		PopulateGameBoard(ResultGB, ShipsToSpawn, this, 50.0f);
 

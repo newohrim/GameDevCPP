@@ -5,7 +5,7 @@
 #include "SimpleGBD.h"
 #include "../Battleship.h"
 
-GameBoard::GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* GameInstance)
+GameBoard::GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* GameInstance, TTF_Font* Font)
 {
 	m_Grid = BoardGrid(BoardHeight, GridRow(BoardWidth));
 	for (uint8_t y = 0; y < BoardHeight; ++y) 
@@ -17,7 +17,7 @@ GameBoard::GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* 
 	}
 
 	BoardPopulator = new SimpleGBP();
-	BoardDrawer = new SimpleGBD(this, GameInstance);
+	BoardDrawer = new SimpleGBD(this, GameInstance, Font);
 }
 
 GameBoard::~GameBoard()

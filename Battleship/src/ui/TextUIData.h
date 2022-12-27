@@ -7,6 +7,8 @@
 class TextUIData
 {
 public:
+	TextUIData() = default;
+
 	TextUIData(
 		TTF_Font* TextFont, const std::string& Text = "", SDL_Renderer* Renderer = nullptr);
 
@@ -23,7 +25,7 @@ public:
 	}
 
 private:
-	TTF_Font* m_Font;
+	TTF_Font* m_Font = nullptr;
 
 	SDL_Texture* m_TextTex = nullptr;
 

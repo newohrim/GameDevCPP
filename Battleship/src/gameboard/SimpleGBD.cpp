@@ -16,7 +16,9 @@ SDL_SetRenderDrawColor( \
 	Renderer, CachedColor.r, CachedColor.g, CachedColor.b, CachedColor.a);
 #endif
 
-SimpleGBD::SimpleGBD(GameBoard* Board, Game* GameInstance)
+SimpleGBD::SimpleGBD(GameBoard* Board, Game* GameInstance, TTF_Font* Font)
+	: m_MarkupRow(Board->GetBoardWidth()), 
+	  m_MarkupColumn(Board->GetBoardHeight())
 {
 	for (uint8_t y = 0; y < Board->GetBoardHeight(); ++y) 
 	{
@@ -24,6 +26,19 @@ SimpleGBD::SimpleGBD(GameBoard* Board, Game* GameInstance)
 		{
 			Quads.push_back(SDL_Rect{ x, y, 1, 1 });
 		}
+	}
+
+	char MarkupSybmol = 'A';
+	for (uint8_t i = 0; i < Board->GetBoardWidth(); ++i)
+	{
+		m_MarkupRow[i] = TextUIData(Font, std::string(1, MarkupSybmol), GameInstance->GetRenderer());
+		if (MarkupSybmol < 127)
+			MarkupSybmol++;
+	}
+
+	for (uint8_t i = 0; i < Board->GetBoardHeight(); ++i)
+	{
+		m_MarkupColumn[i] = TextUIData(Font, std::to_string(i + 1), GameInstance->GetRenderer());
 	}
 
 	m_CellState_Damaged = 
@@ -35,6 +50,7 @@ void SimpleGBD::DrawBoard(GameBoard* Board, SDL_Renderer* Renderer, const float 
 	if (!IsVisible())
 		return;
 
+	DrawMarkupBorder(Board, Renderer, CellSize);
 	DrawGrid(Board, Renderer, CellSize);
 	DrawCellsStates(Board, Renderer, CellSize);
 	HighlightCurrentCell(Board, Renderer, CellSize);
@@ -185,4 +201,20 @@ void SimpleGBD::DrawCellsStates(GameBoard* Board, SDL_Renderer* Renderer, const 
 	}
 
 	CACHE_COLOR_OUT();
+}
+
+void SimpleGBD::DrawMarkupBorder(
+	GameBoard* Board, SDL_Renderer* Renderer, const float CellSize)
+{
+	const float CellSizeHalf = CellSize / 2;
+	const Vector2 BoardPos = GetBoardPosition();
+
+	for (int i = 0; i < m_MarkupRow.size(); ++i) 
+	{
+		m_MarkupRow[i].DrawText(CellSize * i + CellSizeHalf + BoardPos.x, -CellSizeHalf + BoardPos.y, Renderer);
+	}
+	for (int i = 0; i < m_MarkupColumn.size(); ++i)
+	{
+		m_MarkupColumn[i].DrawText(-CellSizeHalf + BoardPos.x, CellSize * i + CellSizeHalf + BoardPos.y, Renderer);
+	}
 }
