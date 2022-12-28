@@ -12,6 +12,8 @@ public:
 
 	TextUIComponent(TTF_Font* Font, Actor* ComponentOwner, int DrawOrder = 100);
 
+	~TextUIComponent();
+
 	void SetText(const std::string& Text);
 
 	void SetTextColor(const SDL_Color& TextColor) { m_TextColor = TextColor; }
@@ -25,5 +27,7 @@ private:
 	SDL_Texture* m_TextTex;
 
 	SDL_Color m_TextColor;
+
+	void ClearTextTexture();
 };
 

@@ -22,39 +22,26 @@ SeaBattleSimpleAI::SeaBattleSimpleAI(GameBoard* GameBoard, Game* GameInstance)
 
 void SeaBattleSimpleAI::MakeMove()
 {
-	/*
-	if (!m_Moves.empty()) 
-	{
-		AIStep& LastStep = m_Moves.top();
-		const BoardCell& Cell = m_TargetGameboard->GetCell(LastStep.m_Coord);
-		if (!Cell.IsEmpty()) 
-		{
-			std::vector<CellCoord> Neighboors = m_TargetGameboard->GetVonNeumannNeighborhood(LastStep.m_Coord);
-
-		}
-	}
-	*/
-
 	// Pick a random cell coord mainly from m_PositiveMoves
 	CellCoord PickedCoord;
 	if (m_PositiveMoves.empty()) 
 	{
+		if (m_PotentialMoves.empty()) 
+		{
+			// No moves left
+			return;
+		}
 		const int RandomIndex = 
 			Random::GetIntRange(0, m_PotentialMoves.size() - 1);
 		PickedCoord = m_PotentialMoves[RandomIndex];
 		m_PotentialMoves.erase(m_PotentialMoves.begin() + RandomIndex);
 	}
-	else if (!m_PotentialMoves.empty())
+	else
 	{
 		const int RandomIndex =
 			Random::GetIntRange(0, m_PositiveMoves.size() - 1);
 		PickedCoord = m_PositiveMoves[RandomIndex].m_Coord;
 		m_PositiveMoves.erase(m_PositiveMoves.begin() + RandomIndex);
-	}
-	else 
-	{
-		// No moves left
-		return;
 	}
 
 	BoardCell& PickedCell = m_TargetGameboard->GetCell(PickedCoord);

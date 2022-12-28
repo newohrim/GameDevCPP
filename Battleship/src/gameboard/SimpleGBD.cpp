@@ -141,10 +141,10 @@ void SimpleGBD::HighlightCurrentCell(GameBoard* Board, SDL_Renderer* Renderer, c
 	const BoardCell* CurrMouseOver = GetCurrMouseOverCell();
 	if (CurrMouseOver) 
 	{
-		const SDL_Color DrawColor = 
-			CurrMouseOver->IsAvailableForShip() ? 
-			SDL_Color{ 255, 255, 0, 255 } : 
-			SDL_Color{ 255, 0, 0, 255 };
+		const SDL_Color DrawColor =
+			m_DrawHintCellHighlight && !CurrMouseOver->IsAvailableForShip() ?
+			SDL_Color{ 255, 0, 0, 255 } :
+			SDL_Color{ 255, 255, 0, 255 };
 		SDL_SetRenderDrawColor(Renderer, DrawColor.r, DrawColor.g, DrawColor.b, DrawColor.a);
 
 		const Vector2 BoardPos = GetBoardPosition();

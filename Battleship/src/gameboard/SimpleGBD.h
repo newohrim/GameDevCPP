@@ -25,6 +25,8 @@ public:
 
 	virtual void SetBoardPosition(Vector2 Position, GameBoard* Board, const float CellSize = 100.0f) override;
 
+	virtual void SetDrawUnavailableCellsHighlight(bool Value) override { m_DrawHintCellHighlight = Value; }
+
 protected:
 	virtual void DrawGrid(
 		GameBoard* Board, SDL_Renderer* Renderer, const float CellSize = 100.0f);
@@ -49,5 +51,9 @@ private:
 	std::vector<TextUIData> m_MarkupColumn;
 
 	SDL_Texture* m_CellState_Damaged = nullptr;
+
+	// Draws red highlight over cell when mouse over
+	// If false draws yellow highlight only
+	bool m_DrawHintCellHighlight = true;
 };
 

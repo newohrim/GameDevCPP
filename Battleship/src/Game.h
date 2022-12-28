@@ -27,6 +27,15 @@ enum PlayerEnum
 	Opponent
 };
 
+enum GameState 
+{
+	Init = 0,
+	Placement,
+	PlayersTurn,
+	OpponentsTurn,
+	GameOver
+};
+
 class Game
 {
 public:
@@ -85,13 +94,12 @@ private:
 
 	GameBoard* m_GameBoard_Player = nullptr;
 	GameBoard* m_GameBoard_Opponent = nullptr;
-	PlayerEnum m_PlayersTurn = PlayerEnum::Player;
 	std::vector<BattleshipStats> m_ShipTamplates;
 	std::vector<PlaceableBattleshipButton*> m_ShipsButtons;
 	SeaBattleSimpleAI* m_OpponentAI;
 
 	bool m_RedrawRequested = true;
-	bool m_IsPlacementStage = false;
+	GameState m_GameState = GameState::Init;
 	PlaceableBattleshipButton* m_ChoosenShipTamplate = nullptr;
 	ShipOrientation m_PlacementShipOrientation = ShipOrientation::Horizontal;
 	TTF_Font* m_MainTextFont = nullptr;

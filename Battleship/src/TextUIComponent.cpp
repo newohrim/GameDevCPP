@@ -17,8 +17,15 @@ TextUIComponent::TextUIComponent(TTF_Font* Font, Actor* ComponentOwner, int Draw
 	m_TextColor = SDL_Color{ 255, 255, 255 };
 }
 
+TextUIComponent::~TextUIComponent()
+{
+	ClearTextTexture();
+}
+
 void TextUIComponent::SetText(const std::string& Text)
 {
+	ClearTextTexture();
+
 	SDL_Surface* SurfaceMessage =
 		TTF_RenderText_Solid(m_Font, Text.c_str(), m_TextColor);
 	SDL_Renderer* Renderer = mOwner->GetGame()->GetRenderer();
@@ -46,4 +53,12 @@ void TextUIComponent::DrawUI(SDL_Renderer* Renderer)
 		TextRect.h * GetRectScale()
 	};
 	SDL_RenderCopy(Renderer, m_TextTex, nullptr, &ScaledRect);
+}
+
+void TextUIComponent::ClearTextTexture()
+{
+	if (m_TextTex)
+	{
+		SDL_DestroyTexture(m_TextTex);
+	}
 }

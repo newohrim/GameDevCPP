@@ -12,6 +12,10 @@ public:
 	TextUIData(
 		TTF_Font* TextFont, const std::string& Text = "", SDL_Renderer* Renderer = nullptr);
 
+	TextUIData& operator=(TextUIData&& Other);
+
+	~TextUIData();
+
 	void SetText(const std::string& Text, SDL_Renderer* Renderer);
 
 	void SetTextColor(const SDL_Color& TextColor) { m_TextColor = TextColor; }
@@ -34,5 +38,7 @@ private:
 	int m_TextWidth = 100;
 
 	int m_TextHeight = 100;
+
+	inline void ClearTextTexture();
 };
 

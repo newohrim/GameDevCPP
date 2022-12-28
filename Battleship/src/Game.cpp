@@ -32,8 +32,8 @@ bool Game::Initialize()
 		"Pong", 
 		100, // Top left x-coord of window
 		100, // Top left y-coord of window
-		1280, // Width of window
-		720, // Height of window
+		1200, // Width of window
+		575, // Height of window
 		0); // Creating flags
 
 	if (!mWindow) 
@@ -351,6 +351,7 @@ void Game::GenerateOutput()
 {
 	if (m_RedrawRequested) 
 	{
+		std::cout << "REDRAW" << '\n';
 		SDL_SetRenderDrawColor(
 			mRenderer,
 			100,   // R
@@ -394,7 +395,7 @@ void Game::LoadData()
 void Game::CreateGameOverPanel(PlayerEnum Winner)
 {
 	GameOverPanel* Temp = new GameOverPanel(m_MainTextFont, Winner, this);
-	Temp->SetPosition(Vector2{ 1280 / 2 - 200, 720 / 2 - 100 });
+	Temp->SetPosition(Vector2{ 1200 / 2 - 200, 575 / 2 - 100 });
 }
 
 void Game::UnloadData()
@@ -465,7 +466,7 @@ void Game::ResetGame()
 	// Destroy panel if still exists
 	DestroyPlacementPanel();
 
-	m_IsPlacementStage = false;
+	m_GameState = GameState::Init;
 
 	// Reload data and recreate entities
 	BeginGame();
@@ -552,17 +553,24 @@ void Game::OnMouseOverHandle(const int Mouse_X, const int Mouse_Y)
 {
 	for (PlaceableBattleshipButton* ShipButton : m_ShipsButtons)
 	{
-		if (ShipButton->GetRectangleClickZone()->IsPointInsideRect(Vector2(Mouse_X, Mouse_Y)))
+		RectangleClickZone* const ClickZone = ShipButton->GetRectangleClickZone();
+		const bool IsMouseOver_Prev = ClickZone->GetIsMouseOver();
+		const bool IsMouseOver_New = 
+			ClickZone->IsPointInsideRect(Vector2(Mouse_X, Mouse_Y));
+		// State transitions to avoid redraw each frame when mouse over
+		// Mouse over state transition: false -> true
+		if (!IsMouseOver_Prev && IsMouseOver_New)
 		{
 			ShipButton->GetSpriteComponent()->SetAlphaModifier(0.5f);
-			ShipButton->GetRectangleClickZone()->SetIsMouseOver(true);
+			ClickZone->SetIsMouseOver(true);
 			RequestRedraw();
 			break;
 		}
-		else if (ShipButton->GetRectangleClickZone()->GetIsMouseOver())
+		// true -> false
+		else if (IsMouseOver_Prev && !IsMouseOver_New)
 		{
 			ShipButton->GetSpriteComponent()->SetAlphaModifier(1.0f);
-			ShipButton->GetRectangleClickZone()->SetIsMouseOver(false);
+			ClickZone->SetIsMouseOver(false);
 			RequestRedraw();
 		}
 	}
@@ -570,7 +578,7 @@ void Game::OnMouseOverHandle(const int Mouse_X, const int Mouse_Y)
 
 void Game::OnMouseDownHandle(const int Mouse_X, const int Mouse_Y)
 {
-	if (m_IsPlacementStage) 
+	if (m_GameState == GameState::Placement)
 	{
 		PlacementStageClickHandle(Mouse_X, Mouse_Y);
 	}
@@ -582,33 +590,33 @@ void Game::OnMouseDownHandle(const int Mouse_X, const int Mouse_Y)
 
 void Game::StartPlacementStage(const std::vector<BattleshipStats>& Tamplates)
 {
-	if (m_IsPlacementStage) 
+	if (m_GameState == GameState::Placement) 
 	{
 		return;
 	}
 
-	m_IsPlacementStage = true;
+	m_GameState = GameState::Placement;
 	CreatePlacementPanel(Tamplates);
 }
 
 void Game::FinishPlacementStage()
 {
-	if (!m_IsPlacementStage)
+	if (m_GameState != GameState::Placement)
 	{
 		return;
 	}
 
 	UnchooseShipTamplate();
 	DestroyPlacementPanel();
-	m_IsPlacementStage = false;
 
 	// TODO: Replace opponents board creation to load game data
 	m_GameBoard_Opponent = CreateAndPopulateGameboard();
 	m_GameBoard_Opponent->GetBoardDrawer()->SetBoardPosition(
 		Vector2{ 50.0f * 12 + 100.0f, 50.0f }, m_GameBoard_Opponent, 50.0f);
 	m_GameBoard_Opponent->GetBoardDrawer()->SetShipsVisability(false, m_GameBoard_Opponent);
-	m_PlayersTurn = PlayerEnum::Player;
-	//SwitchGameboards();
+	m_GameBoard_Opponent->GetBoardDrawer()->SetDrawUnavailableCellsHighlight(false);
+
+	m_GameState = GameState::PlayersTurn;
 }
 
 void Game::CreatePlacementPanel(const std::vector<BattleshipStats>& Tamplates)
@@ -766,6 +774,10 @@ void Game::GameStageClickHandle(const int Mouse_X, const int Mouse_Y)
 		const CellState State = Cell.GetCellState();
 		switch (State)
 		{
+			case CellState::Missed:
+				return;
+			case CellState::ShipDamaged:
+				return;
 			case CellState::ShipPlaced:
 				Cell.SetCellState(CellState::ShipDamaged);
 				if (m_GameBoard_Opponent->CheckGameOverCondition())
@@ -780,14 +792,14 @@ void Game::GameStageClickHandle(const int Mouse_X, const int Mouse_Y)
 			default:
 				break;
 		}
-		m_PlayersTurn = PlayerEnum::Opponent;
+		m_GameState = GameState::OpponentsTurn;
 		m_OpponentAI->MakeMove();
 		if (m_GameBoard_Player->CheckGameOverCondition()) 
 		{
 			GameOver(PlayerEnum::Opponent);
 			return;
 		}
-		m_PlayersTurn = PlayerEnum::Player;
+		m_GameState = GameState::PlayersTurn;
 		RequestRedraw();
 	}
 }

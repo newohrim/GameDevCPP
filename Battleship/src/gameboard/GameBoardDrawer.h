@@ -30,6 +30,8 @@ public:
 
 	virtual void SetBoardPosition(Vector2 Position, GameBoard* Board, const float CellSize = 100.0f) { m_BoardPosition = Position; }
 
+	virtual void SetDrawUnavailableCellsHighlight(bool Value) = 0;
+
 private:
 	BoardCell* m_CurrMouseOverCell = nullptr;
 
