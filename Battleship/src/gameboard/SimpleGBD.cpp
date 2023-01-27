@@ -1,7 +1,7 @@
 #include "SimpleGBD.h"
 
-#include "../SpriteComponent.h"
-#include "../Game.h"
+#include "components/SpriteComponent.h"
+#include "core/Game.h"
 
 #ifndef CACHE_COLOR_IN
 #define CACHE_COLOR_IN() \

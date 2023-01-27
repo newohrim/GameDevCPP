@@ -1,7 +1,7 @@
 #pragma once
 
-#include "UIInterface.h"
-#include "../Component.h"
+#include "ui/UIInterface.h"
+#include "core/Component.h"
 #include "SDL/SDL.h"
 
 class UIContainerActor;

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Actor.h"
-
+#include "core/Actor.h"
 #include "SDL_ttf.h"
 
 class SpriteComponent;

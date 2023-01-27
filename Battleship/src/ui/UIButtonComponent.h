@@ -1,10 +1,10 @@
 #pragma once
 
-#include "UIImageComponent.h"
+#include "ui/UIImageComponent.h"
 #include <functional>
 #include <string>
 #include <memory>
-#include "TextUIData.h"
+#include "ui/TextUIData.h"
 
 class UIButtonComponent;
 class TextUIData;

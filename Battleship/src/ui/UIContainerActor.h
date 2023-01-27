@@ -1,7 +1,7 @@
 #pragma once
 
-#include "UIInterface.h"
-#include "../Actor.h"
+#include "ui/UIInterface.h"
+#include "core/Actor.h"
 #include <vector>
 
 class UIComponent;

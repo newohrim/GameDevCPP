@@ -1,10 +1,10 @@
 #pragma once
 
-#include "GameBoardDrawer.h"
+#include "gameboard/GameBoardDrawer.h"
 #include <vector>
-#include "GameBoard.h"
+#include "gameboard/GameBoard.h"
 #include "SDL/SDL.h"
-#include "../ui/TextUIData.h"
+#include "ui/TextUIData.h"
 
 class Game;
 

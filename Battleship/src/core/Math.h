@@ -246,6 +246,24 @@ public:
 	static const Vector2 NegUnitY;
 };
 
+// 2D Vector
+class Vector2_Int
+{
+public:
+	int x;
+	int y;
+
+	Vector2_Int()
+		:x(0)
+		, y(0)
+	{}
+
+	explicit Vector2_Int(int inX, int inY)
+		:x(inX)
+		, y(inY)
+	{}
+};
+
 // 3D Vector
 class Vector3
 {

@@ -2,7 +2,7 @@
 
 #include <vector>
 //#include "../Battleship.h"
-#include "../Math.h"
+#include "core/Math.h"
 #include "SDL_ttf.h"
 
 class BoardCell;

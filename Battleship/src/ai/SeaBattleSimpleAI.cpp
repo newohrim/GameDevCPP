@@ -1,6 +1,6 @@
 #include "SeaBattleSimpleAI.h"
 
-#include "../Random.h"
+#include "core/Random.h"
 
 SeaBattleSimpleAI::SeaBattleSimpleAI(GameBoard* GameBoard, Game* GameInstance) 
 	: Actor(GameInstance), m_TargetGameboard(GameBoard)

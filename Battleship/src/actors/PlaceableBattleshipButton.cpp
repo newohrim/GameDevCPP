@@ -1,9 +1,9 @@
 #include "PlaceableBattleshipButton.h"
 
-#include "SpriteComponent.h"
-#include "RectangleClickZone.h"
-#include "TextUIComponent.h"
-#include "Battleship.h"
+#include "components/SpriteComponent.h"
+#include "components/RectangleClickZone.h"
+#include "components/TextUIComponent.h"
+#include "actors/Battleship.h"
 
 #include <algorithm>
 #include <string>

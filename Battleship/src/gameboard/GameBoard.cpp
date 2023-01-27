@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "SimpleGBP.h"
 #include "SimpleGBD.h"
-#include "../Battleship.h"
+#include "actors/Battleship.h"
 
 GameBoard::GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* GameInstance, TTF_Font* Font)
 {

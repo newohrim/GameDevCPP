@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Component.h"
-#include "Math.h"
+#include "core/Component.h"
+#include "core/Math.h"
 
 class RectangleClickZone : public Component
 {

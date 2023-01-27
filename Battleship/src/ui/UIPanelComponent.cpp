@@ -1,8 +1,8 @@
 #include "UIPanelComponent.h"
 
 #include "SDL/SDL.h"
-#include "../Math.h"
-#include "../Actor.h"
+#include "core/Math.h"
+#include "core/Actor.h"
 
 UIPanelComponent::UIPanelComponent(UIContainerActor* UIContrainer, int DrawOrder) 
 	: UIComponent(UIContrainer, DrawOrder)

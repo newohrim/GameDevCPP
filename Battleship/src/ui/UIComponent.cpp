@@ -1,8 +1,8 @@
 #include "UIComponent.h"
 
-#include "UIContainerActor.h"
-#include "../Game.h"
-#include "UIPanelComponent.h"
+#include "ui/UIContainerActor.h"
+#include "core/Game.h"
+#include "ui/UIPanelComponent.h"
 
 UIComponent::UIComponent(UIContainerActor* UIContrainer, int DrawOrder)
 	: Component(UIContrainer), m_ParentContainer(UIContrainer), m_DrawOrder(DrawOrder)

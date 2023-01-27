@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Math.h"
-#include "GameBoard.h"
+#include "core/Math.h"
+#include "gameboard/GameBoard.h"
 
 class GameBoard;
 class BoardCell;

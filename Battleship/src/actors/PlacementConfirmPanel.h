@@ -23,7 +23,7 @@ class PlacementConfirmPanel : public UIContainerActor
 {
 public:
 	PlacementConfirmPanel(
-		void(Game::*PlacementHandler)(bool), void(Game::*RotateHandler)(), Game* GameInstance);
+		void(SBGame::*PlacementHandler)(bool), void(SBGame::*RotateHandler)(), Game* GameInstance);
 
 private:
 	ConfirmPanel::CallbackBool m_ConfirmPlacementHandle;

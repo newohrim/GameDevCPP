@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Actor.h"
+#include "core/Actor.h"
 #include "gameboard/GameBoard.h"
 
 struct SDL_Texture;

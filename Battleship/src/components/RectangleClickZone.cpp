@@ -1,9 +1,9 @@
 #include "RectangleClickZone.h"
 
 #include "SDL/SDL.h"
-#include "Actor.h"
+#include "core/Actor.h"
 
-#include "Game.h"
+#include "core/Game.h"
 
 RectangleClickZone::RectangleClickZone(
 	const int ZoneWidth, const int ZoneHeight, Actor* ComponentOwner, int UpdateOrder)

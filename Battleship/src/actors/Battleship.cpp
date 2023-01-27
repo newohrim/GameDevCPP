@@ -1,7 +1,7 @@
 #include "Battleship.h"
 
 //#include "SDL/SDL.h"
-#include "SpriteComponent.h"
+#include "components/SpriteComponent.h"
 
 Battleship::Battleship(
 	BattleshipStats const* ShipStats,

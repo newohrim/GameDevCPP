@@ -1,7 +1,7 @@
 #include "UIImageComponent.h"
 
-#include "../Math.h"
-#include "../Actor.h"
+#include "core/Math.h"
+#include "core/Actor.h"
 
 UIImageComponent::UIImageComponent(
 	SDL_Texture* Texture, UIContainerActor* UIContainer, int DrawOrder) 

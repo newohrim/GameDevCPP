@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameBoardPopulator.h"
+#include "gameboard/GameBoardPopulator.h"
 
 class SimpleGBP : public GameBoardPopulator
 {

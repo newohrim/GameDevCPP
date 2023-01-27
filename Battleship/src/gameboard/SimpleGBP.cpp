@@ -1,8 +1,8 @@
 #include "SimpleGBP.h"
 
-#include "../Random.h"
-#include "../Battleship.h"
-#include "../Game.h"
+#include "core/Random.h"
+#include "actors/Battleship.h"
+#include "core/Game.h"
 
 #include "SDL/SDL.h"
 

@@ -103,7 +103,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\src;C:\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\src;C:\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,7 +135,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\src;C:\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,7 +154,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\src;C:\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -167,27 +167,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ai\SeaBattleSimpleAI.cpp" />
-    <ClCompile Include="src\GameOverPanel.cpp" />
-    <ClCompile Include="src\PlacementConfirmPanel.cpp" />
-    <ClCompile Include="src\RectangleClickZone.cpp" />
-    <ClCompile Include="src\PlaceableBattleshipButton.cpp" />
+    <ClCompile Include="src\actors\GameOverPanel.cpp" />
+    <ClCompile Include="src\actors\PlacementConfirmPanel.cpp" />
+    <ClCompile Include="src\components\RectangleClickZone.cpp" />
+    <ClCompile Include="src\actors\PlaceableBattleshipButton.cpp" />
     <ClCompile Include="src\gameboard\SimpleGBD.cpp" />
     <ClCompile Include="src\gameboard\SimpleGBP.cpp" />
-    <ClCompile Include="src\Battleship.cpp" />
+    <ClCompile Include="src\actors\Battleship.cpp" />
     <ClCompile Include="src\gameboard\GameBoard.cpp" />
-    <ClCompile Include="src\Actor.cpp" />
-    <ClCompile Include="src\Ball2D.cpp" />
-    <ClCompile Include="src\CircleCollisionComponent.cpp" />
-    <ClCompile Include="src\CircleRigidbodyComponent.cpp" />
-    <ClCompile Include="src\Component.cpp" />
-    <ClCompile Include="src\DVDLogo.cpp" />
-    <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\core\Actor.cpp" />
+    <ClCompile Include="src\core\Component.cpp" />
+    <ClCompile Include="src\core\Game.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Math.cpp" />
-    <ClCompile Include="src\MoveConstantComponent.cpp" />
-    <ClCompile Include="src\Random.cpp" />
-    <ClCompile Include="src\SpriteComponent.cpp" />
-    <ClCompile Include="src\TextUIComponent.cpp" />
+    <ClCompile Include="src\core\Math.cpp" />
+    <ClCompile Include="src\core\Random.cpp" />
+    <ClCompile Include="src\components\SpriteComponent.cpp" />
+    <ClCompile Include="src\components\TextUIComponent.cpp" />
+    <ClCompile Include="src\SBGame.cpp" />
     <ClCompile Include="src\ui\UIButtonComponent.cpp" />
     <ClCompile Include="src\ui\UIComponent.cpp" />
     <ClCompile Include="src\ui\UIContainerActor.cpp" />
@@ -197,28 +193,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ai\SeaBattleSimpleAI.h" />
-    <ClInclude Include="src\GameOverPanel.h" />
-    <ClInclude Include="src\PlacementConfirmPanel.h" />
-    <ClInclude Include="src\RectangleClickZone.h" />
-    <ClInclude Include="src\PlaceableBattleshipButton.h" />
+    <ClInclude Include="src\actors\GameOverPanel.h" />
+    <ClInclude Include="src\actors\PlacementConfirmPanel.h" />
+    <ClInclude Include="src\components\RectangleClickZone.h" />
+    <ClInclude Include="src\actors\PlaceableBattleshipButton.h" />
     <ClInclude Include="src\gameboard\GameBoardDrawer.h" />
     <ClInclude Include="src\gameboard\SimpleGBD.h" />
     <ClInclude Include="src\gameboard\GameBoardPopulator.h" />
     <ClInclude Include="src\gameboard\SimpleGBP.h" />
-    <ClInclude Include="src\Battleship.h" />
+    <ClInclude Include="src\actors\Battleship.h" />
     <ClInclude Include="src\gameboard\GameBoard.h" />
-    <ClInclude Include="src\Actor.h" />
-    <ClInclude Include="src\Ball2D.h" />
-    <ClInclude Include="src\CircleCollisionComponent.h" />
-    <ClInclude Include="src\CircleRigidbodyComponent.h" />
-    <ClInclude Include="src\Component.h" />
-    <ClInclude Include="src\DVDLogo.h" />
-    <ClInclude Include="src\Game.h" />
-    <ClInclude Include="src\Math.h" />
-    <ClInclude Include="src\MoveConstantComponent.h" />
-    <ClInclude Include="src\Random.h" />
-    <ClInclude Include="src\SpriteComponent.h" />
-    <ClInclude Include="src\TextUIComponent.h" />
+    <ClInclude Include="src\core\Actor.h" />
+    <ClInclude Include="src\core\Component.h" />
+    <ClInclude Include="src\core\Game.h" />
+    <ClInclude Include="src\core\Math.h" />
+    <ClInclude Include="src\core\Random.h" />
+    <ClInclude Include="src\components\SpriteComponent.h" />
+    <ClInclude Include="src\components\TextUIComponent.h" />
+    <ClInclude Include="src\SBGame.h" />
     <ClInclude Include="src\ui\UIButtonComponent.h" />
     <ClInclude Include="src\ui\UIComponent.h" />
     <ClInclude Include="src\ui\UIContainerActor.h" />

@@ -2,7 +2,7 @@
 
 #include "ui/UIPanelComponent.h"
 #include "ui/UIButtonComponent.h"
-#include "Game.h"
+#include "core/Game.h"
 
 PlacementConfirmPanel::PlacementConfirmPanel(
 	void(Game::* Handler)(bool), void(Game::* RotateHandler)(), Game* GameInstance)

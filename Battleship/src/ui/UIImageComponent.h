@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UIComponent.h"
+#include "ui/UIComponent.h"
 
 class UIImageComponent : public UIComponent
 {

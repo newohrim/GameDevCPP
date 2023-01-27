@@ -3,8 +3,8 @@
 #include "ui/UIPanelComponent.h"
 #include "ui/UIButtonComponent.h"
 #include "ui/TextUIData.h"
-#include "TextUIComponent.h"
-#include "Game.h"
+#include "components/TextUIComponent.h"
+#include "core/Game.h"
 
 GameOverPanel::GameOverPanel(TTF_Font* Font, PlayerEnum Winner, Game* GameInstance)
 	: UIContainerActor(GameInstance)

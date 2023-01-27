@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Actor.h"
-#include "../gameboard/GameBoard.h"
+#include "core/Actor.h"
+#include "gameboard/GameBoard.h"
 #include <vector>
 
 struct AIStep 

@@ -1,7 +1,7 @@
 #include "UIContainerActor.h"
 
-#include "UIComponent.h"
-#include "../Game.h"
+#include "ui/UIComponent.h"
+#include "core/Game.h"
 
 UIContainerActor::UIContainerActor(Game* GameInstance) 
 	: Actor(GameInstance)

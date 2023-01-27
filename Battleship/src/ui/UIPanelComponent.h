@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UIComponent.h"
+#include "ui/UIComponent.h"
 #include "SDL/SDL.h"
 
 class UIPanelComponent : public UIComponent

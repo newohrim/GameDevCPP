@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameBoard.h"
+#include "gameboard/GameBoard.h"
 #include <vector>
 
 struct BattleshipStats;

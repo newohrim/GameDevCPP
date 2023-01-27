@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Math.h"
+#include "core/Math.h"
 
 struct SDL_Renderer;
 

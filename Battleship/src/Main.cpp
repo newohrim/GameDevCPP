@@ -1,5 +1,5 @@
 #define SDL_MAIN_HANDLED
-#include "Game.h"
+#include "core/Game.h"
 
 int main(int argc, char* argv[])
 {
