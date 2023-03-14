@@ -2,14 +2,16 @@
 
 #include "ui/UIPanelComponent.h"
 #include "ui/UIButtonComponent.h"
-#include "core/Game.h"
+#include "SBGame.h"
 
 PlacementConfirmPanel::PlacementConfirmPanel(
-	void(Game::* Handler)(bool), void(Game::* RotateHandler)(), Game* GameInstance)
+	void(SBGame::* Handler)(bool), void(SBGame::* RotateHandler)(), Game* GameInstance)
 	: UIContainerActor(GameInstance)
 {
-	m_ConfirmPlacementHandle.m_Callback = std::bind(Handler, GameInstance, std::placeholders::_1);
-	m_RotateShipHandle.m_Callback = std::bind(RotateHandler, GameInstance);
+	m_ConfirmPlacementHandle.m_Callback = std::bind(
+		Handler, static_cast<SBGame*>(GameInstance), std::placeholders::_1);
+	m_RotateShipHandle.m_Callback = std::bind(
+		RotateHandler, static_cast<SBGame*>(GameInstance));
 
 	UIPanelComponent* const Panel = new UIPanelComponent(this, -1);
 	Panel->SetPanelColor({125, 125, 125 });
@@ -22,7 +24,8 @@ PlacementConfirmPanel::PlacementConfirmPanel(
 			new UIButtonComponent(ConfirmButtonTex, this, 1);
 		ConfirmButton->SetRectPosition(10, 10);
 		ConfirmButton->SetRectScale(0.25f);
-		ConfirmButton->SetOnClickHandler<PlacementConfirmPanel>(this, &PlacementConfirmPanel::ConfirmPlacement_Handle);
+		ConfirmButton->SetOnClickHandler<PlacementConfirmPanel>(
+			this, &PlacementConfirmPanel::ConfirmPlacement_Handle);
 	}
 
 	{
@@ -32,7 +35,8 @@ PlacementConfirmPanel::PlacementConfirmPanel(
 			new UIButtonComponent(RotateButtonTex, this, 1);
 		RotateButton->SetRectPosition(52, 10);
 		RotateButton->SetRectScale(0.25f);
-		RotateButton->SetOnClickHandler<PlacementConfirmPanel>(this, &PlacementConfirmPanel::RotateShip_Handle);
+		RotateButton->SetOnClickHandler<PlacementConfirmPanel>(
+			this, &PlacementConfirmPanel::RotateShip_Handle);
 	}
 
 	{
@@ -42,7 +46,8 @@ PlacementConfirmPanel::PlacementConfirmPanel(
 			new UIButtonComponent(RotateButtonTex, this, 1);
 		RotateButton->SetRectPosition(92, 10);
 		RotateButton->SetRectScale(0.25f);
-		RotateButton->SetOnClickHandler<PlacementConfirmPanel>(this, &PlacementConfirmPanel::CancelPlacement_Handle);
+		RotateButton->SetOnClickHandler<PlacementConfirmPanel>(
+			this, &PlacementConfirmPanel::CancelPlacement_Handle);
 	}
 }
 

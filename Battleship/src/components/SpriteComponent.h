@@ -9,9 +9,10 @@
 #pragma once
 
 #include "core/Component.h"
+#include "interfaces/IRectProvider2D.h"
 #include "SDL/SDL.h"
 
-class SpriteComponent : public Component
+class SpriteComponent : public Component, public RectProvider2D
 {
 public:
 	// (Lower draw order corresponds with further back)
@@ -33,6 +34,8 @@ public:
 
 	const SDL_Color& GetColorModifier() const { return m_ColorModifier; }
 	void SetColorModifier(const SDL_Color& ColorModifer) { m_ColorModifier = ColorModifer; }
+
+	virtual bool IsPointInside(Vector2 Point) const override;
 
 protected:
 	SDL_Texture* mTexture;

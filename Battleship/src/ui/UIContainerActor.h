@@ -19,11 +19,11 @@ public:
 
 	virtual void DrawUI(SDL_Renderer* Renderer) override;
 
-	virtual bool IsPointInside(Vector2 Point) override;
+	virtual bool RectProvider2D::IsPointInside(Vector2 Point) override;
 
-	virtual bool ConsumeInput_MouseClick(Vector2 MousePos) override;
+	virtual bool ConsumeInput_MouseClick(Vector2_Int MousePos) override;
 
-	virtual bool ConsumeInput_MouseOver(Vector2 MousePos) override;
+	virtual bool ConsumeInput_MouseOver(Vector2_Int MousePos) override;
 
 private:
 	std::vector<UIComponent*> m_UIComponents;

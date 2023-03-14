@@ -1,5 +1,6 @@
 #include "UIPanelComponent.h"
 
+#include "SBGame.h"
 #include "SDL/SDL.h"
 #include "core/Math.h"
 #include "core/Actor.h"

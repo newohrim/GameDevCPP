@@ -155,6 +155,21 @@ void Game::RemoveUIItem(UIInterface * UIItem)
 	}
 }
 
+void Game::AddRect2D(RectProvider2D* Rect2D)
+{
+	m_Rects2D.push_back(Rect2D);
+}
+
+void Game::RemoveRect2D(RectProvider2D* Rect2D)
+{
+	const auto Iter =
+		std::find(m_Rects2D.begin(), m_Rects2D.end(), Rect2D);
+	if (Iter != m_Rects2D.end())
+	{
+		m_Rects2D.erase(Iter);
+	}
+}
+
 SDL_Texture* Game::GetTexture(const std::string& fileName)
 {
 	SDL_Texture* tex = nullptr;
@@ -196,6 +211,26 @@ void Game::ProcessInput()
 	// Get mouse cursor position in window space
 	//int Mouse_X, Mouse_Y;
 	SDL_GetMouseState(&m_MousePos.x, &m_MousePos.y);
+
+	ProvideUIWithInput_MouseOver(
+		Vector2(m_MousePos.x, m_MousePos.y));
+
+	SDL_Event event;
+	while (SDL_PollEvent(&event))
+	{
+		switch (event.type)
+		{
+		case SDL_QUIT:
+			ExitGame();
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			ProvideUIWithInput_MouseClick(
+				Vector2(m_MousePos.x, m_MousePos.y));
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void Game::UpdateGame() 
@@ -292,22 +327,32 @@ void Game::UnloadData()
 
 bool Game::ProvideUIWithInput_MouseClick(Vector2 MousePos)
 {
-	bool WasUIInteracted = false;
-	for (UIInterface* UIItem : m_UIItems) 
+	//bool WasUIInteracted = false;
+	for (RectProvider2D* Rect2D : m_Rects2D) 
 	{
-		WasUIInteracted |= UIItem->ConsumeInput_MouseClick(MousePos);
+		if (Rect2D->IsPointInside(MousePos))
+		{
+			Rect2D->ConsumeInput_MouseClick(
+				Vector2_Int{ (int)MousePos.x, (int)MousePos.y });
+			return true;
+		}
 	}
 
-	return WasUIInteracted;
+	return false;
 }
 
 bool Game::ProvideUIWithInput_MouseOver(Vector2 MousePos)
 {
-	bool WasUIInteracted = false;
-	for (UIInterface* UIItem : m_UIItems)
+	//bool WasUIInteracted = false;
+	for (RectProvider2D* Rect2D : m_Rects2D)
 	{
-		WasUIInteracted |= UIItem->ConsumeInput_MouseOver(MousePos);
+		if (Rect2D->IsPointInside(MousePos))
+		{
+			Rect2D->ConsumeInput_MouseOver(
+				Vector2_Int{ (int)MousePos.x, (int)MousePos.y });
+			return true;
+		}
 	}
 
-	return WasUIInteracted;
+	return false;
 }

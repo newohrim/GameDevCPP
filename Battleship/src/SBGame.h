@@ -4,9 +4,9 @@
 #include "actors/Battleship.h"
 
 class GameBoard;
-class PlaceableBattleshipButton;
 class SeaBattleSimpleAI;
 class PlacementConfirmPanel;
+class PlacementPanel;
 
 enum PlayerEnum
 {
@@ -28,6 +28,8 @@ class SBGame : public Game
 public:
 	void ResetGame();
 
+	void ShipTemplateSelected_Handle(BattleshipStats& Template);
+
 protected:
 	virtual void ProcessInput() override;
 	virtual void DrawCustom(SDL_Renderer* Renderer) override;
@@ -39,15 +41,17 @@ private:
 	GameBoard* m_GameBoard_Player = nullptr;
 	GameBoard* m_GameBoard_Opponent = nullptr;
 	std::vector<BattleshipStats> m_ShipTamplates;
-	std::vector<PlaceableBattleshipButton*> m_ShipsButtons;
 	SeaBattleSimpleAI* m_OpponentAI;
 
 	GameState m_GameState = GameState::Init;
-	PlaceableBattleshipButton* m_ChoosenShipTamplate = nullptr;
+	BattleshipStats* m_ChoosenShipTamplate = nullptr;
 	ShipOrientation m_PlacementShipOrientation = ShipOrientation::Horizontal;
 	TTF_Font* m_MainTextFont = nullptr;
 	PlacementConfirmPanel* m_CreatedConfirmPanel = nullptr;
 	Battleship* m_GhostShip = nullptr;
+	PlacementPanel* m_PlacementPanel = nullptr;
+
+	float m_CellSize = 50.0f;
 
 	void BeginGame();
 
@@ -61,11 +65,11 @@ private:
 
 	void OnMouseDownHandle(const int Mouse_X, const int Mouse_Y);
 
-	void StartPlacementStage(const std::vector<BattleshipStats>& Tamplates);
+	void StartPlacementStage(const std::vector<BattleshipStats>& Templates);
 
 	void FinishPlacementStage();
 
-	void CreatePlacementPanel(const std::vector<BattleshipStats>& Tamplates);
+	void CreatePlacementPanel(const std::vector<BattleshipStats>& Templates);
 
 	void DestroyPlacementPanel();
 
@@ -75,7 +79,7 @@ private:
 
 	Battleship* CreateShip(const CellCoord& MouseOnBoardCoord_Player);
 
-	void ChooseShipTamplate(PlaceableBattleshipButton* ShipButton);
+	void ChooseShipTamplate(BattleshipStats* Template);
 
 	void UnchooseShipTamplate();
 
@@ -87,6 +91,6 @@ private:
 
 	void DestroyGhostShip();
 
-	GameBoard* CreateAndPopulateGameboard();
+	GameBoard* CreateAndPopulateGameboard(int BoardWidth, int BoardHeight);
 };
 

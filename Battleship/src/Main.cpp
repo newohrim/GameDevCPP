@@ -1,9 +1,9 @@
 #define SDL_MAIN_HANDLED
-#include "core/Game.h"
+#include "SBGame.h"
 
 int main(int argc, char* argv[])
 {
-	Game game;
+	SBGame game;
 	bool success = game.Initialize();
 	if (success) 
 	{

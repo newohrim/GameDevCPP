@@ -21,11 +21,21 @@ public:
 
 	void SetRectDimension(const int Width, const int Height);
 
+	float GetRectAngle() const { return m_DrawAngle; }
+
+	void SetRectAngle(const float Angle) { m_DrawAngle = Angle; }
+
 	float GetRectScale() const { return m_DrawScale; }
 
 	void SetRectScale(const float RectScale);
 
 	int GetDrawOrder() const { return m_DrawOrder; }
+
+	SDL_Point GetPivot() const { return m_Pivot; }
+
+	void SetPivot(const SDL_Point& Pivot) { m_Pivot = Pivot; }
+
+	void SetPivotInMiddle();
 
 	virtual bool IsPointInside(Vector2 Point) override;
 
@@ -38,8 +48,13 @@ private:
 
 	SDL_Rect m_DrawRect;
 
+	SDL_Point m_Pivot;
+
+	float m_DrawAngle;
+
 	float m_DrawScale;
 
 	int m_DrawOrder;
+
 };
 

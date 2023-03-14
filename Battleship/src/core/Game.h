@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include "core/Math.h"
 
 #include "SDL_ttf.h"
 
@@ -14,6 +15,7 @@ struct SDL_Texture;
 class Actor;
 class SpriteComponent;
 class UIInterface;
+class RectProvider2D;
 
 class Game
 {
@@ -29,8 +31,11 @@ public:
 	void AddSprite(SpriteComponent* SpriteToAdd);
 	void RemoveSprite(SpriteComponent* SpriteToRemove);
 
-	void AddUIItem(UIInterface * UIItem);
-	void RemoveUIItem(UIInterface * UIItem);
+	void AddUIItem(UIInterface* UIItem);
+	void RemoveUIItem(UIInterface* UIItem);
+
+	void AddRect2D(RectProvider2D* Rect2D);
+	void RemoveRect2D(RectProvider2D* Rect2D);
 
 	Vector2_Int GetMousePos() const { return m_MousePos; }
 
@@ -62,6 +67,7 @@ private:
 	std::vector<Actor*> mPendingActors;
 	std::vector<SpriteComponent*> mSprites;
 	std::vector<UIInterface*> m_UIItems;
+	std::vector<RectProvider2D*> m_Rects2D;
 
 	SDL_Window* mWindow = nullptr;
 	SDL_Renderer* mRenderer;

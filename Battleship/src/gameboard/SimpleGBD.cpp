@@ -2,6 +2,7 @@
 
 #include "components/SpriteComponent.h"
 #include "core/Game.h"
+#include "actors/Battleship.h"
 
 #ifndef CACHE_COLOR_IN
 #define CACHE_COLOR_IN() \
@@ -16,27 +17,28 @@ SDL_SetRenderDrawColor( \
 	Renderer, CachedColor.r, CachedColor.g, CachedColor.b, CachedColor.a);
 #endif
 
-SimpleGBD::SimpleGBD(GameBoard* Board, Game* GameInstance, TTF_Font* Font)
-	: m_MarkupRow(Board->GetBoardWidth()), 
-	  m_MarkupColumn(Board->GetBoardHeight())
+SimpleGBD::SimpleGBD(int Width, int Height, float CellSize, Game* GameInstance, TTF_Font* Font)
+	: GameBoardDrawer(CellSize),
+	  m_MarkupRow(Width), 
+	  m_MarkupColumn(Height)
 {
-	for (uint8_t y = 0; y < Board->GetBoardHeight(); ++y) 
+	for (uint8_t y = 0; y < Width; ++y) 
 	{
-		for (uint8_t x = 0; x < Board->GetBoardWidth(); ++x) 
+		for (uint8_t x = 0; x < Height; ++x) 
 		{
 			Quads.push_back(SDL_Rect{ x, y, 1, 1 });
 		}
 	}
 
 	char MarkupSybmol = 'A';
-	for (uint8_t i = 0; i < Board->GetBoardWidth(); ++i)
+	for (uint8_t i = 0; i < Width; ++i)
 	{
 		m_MarkupRow[i] = TextUIData(Font, std::string(1, MarkupSybmol), GameInstance->GetRenderer());
 		if (MarkupSybmol < 127)
 			MarkupSybmol++;
 	}
 
-	for (uint8_t i = 0; i < Board->GetBoardHeight(); ++i)
+	for (uint8_t i = 0; i < Height; ++i)
 	{
 		m_MarkupColumn[i] = TextUIData(Font, std::to_string(i + 1), GameInstance->GetRenderer());
 	}
@@ -45,37 +47,37 @@ SimpleGBD::SimpleGBD(GameBoard* Board, Game* GameInstance, TTF_Font* Font)
 		GameInstance->GetTexture("Assets/cells/cell_redcross.png");
 }
 
-void SimpleGBD::DrawBoard(GameBoard* Board, SDL_Renderer* Renderer, const float CellSize)
+void SimpleGBD::DrawBoard(GameBoard* Board, SDL_Renderer* Renderer)
 {
 	if (!IsVisible())
 		return;
 
-	DrawMarkupBorder(Board, Renderer, CellSize);
-	DrawGrid(Board, Renderer, CellSize);
-	DrawCellsStates(Board, Renderer, CellSize);
-	HighlightCurrentCell(Board, Renderer, CellSize);
+	DrawMarkupBorder(Renderer);
+	DrawGrid(Renderer);
+	DrawCellsStates(Board, Renderer);
+	HighlightCurrentCell(Renderer);
 }
 
-CellCoord SimpleGBD::GetWorldToBoardPos(GameBoard* Board, const Vector2 WorldPos, const float CellSize) const
+CellCoord SimpleGBD::GetWorldToBoardPos(const Vector2 WorldPos) const
 {
 	const Vector2 LocalPos = WorldPos - GetBoardPosition();
 	const CellCoord Result = 
 	{ 
-		(uint8_t)(LocalPos.x / CellSize),
-		(uint8_t)(LocalPos.y / CellSize)
+		(uint8_t)(LocalPos.x / m_CellSize),
+		(uint8_t)(LocalPos.y / m_CellSize)
 	};
 
 	return Result;
 }
 
-void SimpleGBD::SetDrawVisablity(bool IsVisible, GameBoard* Board)
+void SimpleGBD::SetDrawVisablity(GameBoard* Board, bool IsVisible)
 {
-	GameBoardDrawer::SetDrawVisablity(IsVisible, Board);
+	GameBoardDrawer::SetDrawVisablity(Board, IsVisible);
 
-	SetShipsVisability(IsVisible, Board);
+	SetShipsVisability(Board, IsVisible);
 }
 
-void SimpleGBD::SetShipsVisability(bool IsVisible, GameBoard* Board)
+void SimpleGBD::SetShipsVisability(GameBoard* Board, bool IsVisible)
 {
 	const std::vector<Battleship*>& Ships = Board->GetShipsOnBoard();
 	for (Battleship* Ship : Ships)
@@ -84,19 +86,19 @@ void SimpleGBD::SetShipsVisability(bool IsVisible, GameBoard* Board)
 	}
 }
 
-void SimpleGBD::SetBoardPosition(Vector2 Position, GameBoard* Board, const float CellSize)
+void SimpleGBD::SetBoardPosition(GameBoard* Board, Vector2 Position)
 {
-	GameBoardDrawer::SetBoardPosition(Position, Board);
+	GameBoardDrawer::SetBoardPosition(Board, Position);
 
 	const std::vector<Battleship*> ShipsOnBoard = Board->GetShipsOnBoard();
 	for (Battleship* Ship : ShipsOnBoard) 
 	{
 		const CellCoord Coord = Ship->GetShipOnBoardCoords();
-		Ship->SetPosition(Board->GetCorrectShipPosition(Ship, CellSize));
+		Ship->SetPosition(Board->GetCorrectShipPosition(Ship, m_CellSize));
 	}
 }
 
-void SimpleGBD::DrawGrid(GameBoard* Board, SDL_Renderer* Renderer, const float CellSize)
+void SimpleGBD::DrawGrid(SDL_Renderer* Renderer)
 {
 	CACHE_COLOR_IN();
 
@@ -104,10 +106,10 @@ void SimpleGBD::DrawGrid(GameBoard* Board, SDL_Renderer* Renderer, const float C
 	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255);
 	for (SDL_Rect Rect : Quads)
 	{
-		Rect.x = Rect.x * CellSize + BoardPos.x;
-		Rect.y = Rect.y * CellSize + BoardPos.y;
-		Rect.w *= CellSize;
-		Rect.h *= CellSize;
+		Rect.x = Rect.x * m_CellSize + BoardPos.x;
+		Rect.y = Rect.y * m_CellSize + BoardPos.y;
+		Rect.w *= m_CellSize;
+		Rect.h *= m_CellSize;
 		SDL_RenderDrawRect(Renderer, &Rect);
 	}
 	//SDL_RenderDrawRects(Renderer, Quads.data, Quads.size());
@@ -115,7 +117,7 @@ void SimpleGBD::DrawGrid(GameBoard* Board, SDL_Renderer* Renderer, const float C
 	CACHE_COLOR_OUT();
 }
 
-void SimpleGBD::DrawCells(GameBoard* Board, SDL_Renderer* Renderer, const float CellSize)
+void SimpleGBD::DrawCells(SDL_Renderer* Renderer)
 {
 	CACHE_COLOR_IN();
 
@@ -123,10 +125,10 @@ void SimpleGBD::DrawCells(GameBoard* Board, SDL_Renderer* Renderer, const float 
 	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255);
 	for (SDL_Rect Rect : Quads)
 	{
-		Rect.x = Rect.x * CellSize + BoardPos.x;
-		Rect.y = Rect.y * CellSize + BoardPos.y;
-		Rect.w *= CellSize;
-		Rect.h *= CellSize;
+		Rect.x = Rect.x * m_CellSize + BoardPos.x;
+		Rect.y = Rect.y * m_CellSize + BoardPos.y;
+		Rect.w *= m_CellSize;
+		Rect.h *= m_CellSize;
 		SDL_RenderFillRect(Renderer, &Rect);
 	}
 	//SDL_RenderDrawRects(Renderer, Quads.data, Quads.size());
@@ -134,7 +136,7 @@ void SimpleGBD::DrawCells(GameBoard* Board, SDL_Renderer* Renderer, const float 
 	CACHE_COLOR_OUT();
 }
 
-void SimpleGBD::HighlightCurrentCell(GameBoard* Board, SDL_Renderer* Renderer, const float CellSize)
+void SimpleGBD::HighlightCurrentCell(SDL_Renderer* Renderer)
 {
 	CACHE_COLOR_IN();
 
@@ -151,10 +153,10 @@ void SimpleGBD::HighlightCurrentCell(GameBoard* Board, SDL_Renderer* Renderer, c
 		const CellCoord Coord = CurrMouseOver->GetCellCoords();
 		const SDL_Rect HightlightRect = 
 		{ 
-			Coord.x * CellSize + BoardPos.x,
-			Coord.y * CellSize + BoardPos.y,
-			CellSize, 
-			CellSize 
+			Coord.x * m_CellSize + BoardPos.x,
+			Coord.y * m_CellSize + BoardPos.y,
+			m_CellSize,
+			m_CellSize
 		};
 		SDL_RenderDrawRect(Renderer, &HightlightRect);
 	}
@@ -162,7 +164,7 @@ void SimpleGBD::HighlightCurrentCell(GameBoard* Board, SDL_Renderer* Renderer, c
 	CACHE_COLOR_OUT();
 }
 
-void SimpleGBD::DrawCellsStates(GameBoard* Board, SDL_Renderer* Renderer, const float CellSize)
+void SimpleGBD::DrawCellsStates(GameBoard* Board, SDL_Renderer* Renderer)
 {
 	CACHE_COLOR_IN();
 
@@ -175,10 +177,10 @@ void SimpleGBD::DrawCellsStates(GameBoard* Board, SDL_Renderer* Renderer, const 
 			continue;
 		const SDL_Rect Rect =
 		{
-			Quad.x * CellSize + BoardPos.x,
-			Quad.y * CellSize + BoardPos.y,
-			Quad.w * CellSize,
-			Quad.h * CellSize
+			Quad.x * m_CellSize + BoardPos.x,
+			Quad.y * m_CellSize + BoardPos.y,
+			Quad.w * m_CellSize,
+			Quad.h * m_CellSize
 		};
 		switch (State)
 		{
@@ -203,18 +205,17 @@ void SimpleGBD::DrawCellsStates(GameBoard* Board, SDL_Renderer* Renderer, const 
 	CACHE_COLOR_OUT();
 }
 
-void SimpleGBD::DrawMarkupBorder(
-	GameBoard* Board, SDL_Renderer* Renderer, const float CellSize)
+void SimpleGBD::DrawMarkupBorder(SDL_Renderer* Renderer)
 {
-	const float CellSizeHalf = CellSize / 2;
+	const float CellSizeHalf = m_CellSize / 2;
 	const Vector2 BoardPos = GetBoardPosition();
 
 	for (int i = 0; i < m_MarkupRow.size(); ++i) 
 	{
-		m_MarkupRow[i].DrawText(CellSize * i + CellSizeHalf + BoardPos.x, -CellSizeHalf + BoardPos.y, Renderer);
+		m_MarkupRow[i].DrawText(m_CellSize * i + CellSizeHalf + BoardPos.x, -CellSizeHalf + BoardPos.y, Renderer);
 	}
 	for (int i = 0; i < m_MarkupColumn.size(); ++i)
 	{
-		m_MarkupColumn[i].DrawText(-CellSizeHalf + BoardPos.x, CellSize * i + CellSizeHalf + BoardPos.y, Renderer);
+		m_MarkupColumn[i].DrawText(-CellSizeHalf + BoardPos.x, m_CellSize * i + CellSizeHalf + BoardPos.y, Renderer);
 	}
 }

@@ -166,11 +166,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\actors\PlacementPanel.cpp" />
     <ClCompile Include="src\ai\SeaBattleSimpleAI.cpp" />
     <ClCompile Include="src\actors\GameOverPanel.cpp" />
     <ClCompile Include="src\actors\PlacementConfirmPanel.cpp" />
     <ClCompile Include="src\components\RectangleClickZone.cpp" />
     <ClCompile Include="src\actors\PlaceableBattleshipButton.cpp" />
+    <ClCompile Include="src\gameboard\GameBoardDrawer.cpp" />
     <ClCompile Include="src\gameboard\SimpleGBD.cpp" />
     <ClCompile Include="src\gameboard\SimpleGBP.cpp" />
     <ClCompile Include="src\actors\Battleship.cpp" />
@@ -178,6 +180,7 @@
     <ClCompile Include="src\core\Actor.cpp" />
     <ClCompile Include="src\core\Component.cpp" />
     <ClCompile Include="src\core\Game.cpp" />
+    <ClCompile Include="src\ui\RectProvider2D.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\core\Math.cpp" />
     <ClCompile Include="src\core\Random.cpp" />
@@ -192,6 +195,7 @@
     <ClCompile Include="src\ui\TextUIData.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\actors\PlacementPanel.h" />
     <ClInclude Include="src\ai\SeaBattleSimpleAI.h" />
     <ClInclude Include="src\actors\GameOverPanel.h" />
     <ClInclude Include="src\actors\PlacementConfirmPanel.h" />
@@ -210,6 +214,7 @@
     <ClInclude Include="src\core\Random.h" />
     <ClInclude Include="src\components\SpriteComponent.h" />
     <ClInclude Include="src\components\TextUIComponent.h" />
+    <ClInclude Include="src\ui\RectProvider2D.h" />
     <ClInclude Include="src\SBGame.h" />
     <ClInclude Include="src\ui\UIButtonComponent.h" />
     <ClInclude Include="src\ui\UIComponent.h" />

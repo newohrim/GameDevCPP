@@ -4,6 +4,7 @@
 #include <functional>
 
 class UIButtonComponent;
+class SBGame;
 using ConfirmationHandler = void (*)(bool);
 
 namespace ConfirmPanel 

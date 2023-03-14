@@ -32,6 +32,8 @@ void UIContainerActor::AddUIComponent(UIComponent* UIComponent)
 
 	// Inserts element before position of iterator
 	m_UIComponents.insert(Iter, UIComponent);
+
+	GetGame()->AddRect2D(UIComponent);
 }
 
 void UIContainerActor::RemoveUIComponent(UIComponent* UIComponent)
@@ -42,6 +44,8 @@ void UIContainerActor::RemoveUIComponent(UIComponent* UIComponent)
 	{
 		m_UIComponents.erase(iter);
 	}
+
+	GetGame()->RemoveRect2D(UIComponent);
 }
 
 void UIContainerActor::DrawUI(SDL_Renderer* Renderer)
@@ -54,7 +58,7 @@ void UIContainerActor::DrawUI(SDL_Renderer* Renderer)
 
 bool UIContainerActor::IsPointInside(Vector2 Point)
 {
-	for (UIComponent* Comp : m_UIComponents) 
+	/*for (UIComponent* Comp : m_UIComponents) 
 	{
 		if (Comp->IsPointInside(Point)) 
 		{
@@ -62,27 +66,27 @@ bool UIContainerActor::IsPointInside(Vector2 Point)
 		}
 	}
 
-	return false;
+	return false;*/
 }
 
-bool UIContainerActor::ConsumeInput_MouseClick(Vector2 MousePos)
+bool UIContainerActor::ConsumeInput_MouseClick(Vector2_Int MousePos)
 {
-	bool WasUIInteracted = false;
+	/*bool WasUIInteracted = false;
 	for (UIComponent* Comp : m_UIComponents) 
 	{
 		WasUIInteracted |= Comp->ConsumeInput_MouseClick(MousePos);
 	}
 
-	return WasUIInteracted;
+	return WasUIInteracted;*/
 }
 
-bool UIContainerActor::ConsumeInput_MouseOver(Vector2 MousePos)
+bool UIContainerActor::ConsumeInput_MouseOver(Vector2_Int MousePos)
 {
-	bool WasUIInteracted = false;
+	/*bool WasUIInteracted = false;
 	for (UIComponent* Comp : m_UIComponents)
 	{
 		WasUIInteracted |= Comp->ConsumeInput_MouseOver(MousePos);
 	}
 
-	return WasUIInteracted;
+	return WasUIInteracted;*/
 }

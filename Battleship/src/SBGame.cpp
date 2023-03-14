@@ -2,13 +2,14 @@
 
 #include "core/Random.h"
 #include "gameboard/GameBoard.h"
-#include "gameboard/GameBoardDrawer.h"
-#include "gameboard/GameBoardPopulator.h"
+#include "gameboard/SimpleGBD.h"
+#include "gameboard/SimpleGBP.h"
 #include "actors/PlaceableBattleshipButton.h"
 #include "components/RectangleClickZone.h"
 #include "ai/SeaBattleSimpleAI.h"
 #include "actors/PlacementConfirmPanel.h"
 #include "actors/GameOverPanel.h"
+#include "actors/PlacementPanel.h"
 
 #include "core/Actor.h"
 #include "components/SpriteComponent.h"
@@ -34,6 +35,47 @@ void SBGame::ResetGame()
 	BeginGame();
 }
 
+void SBGame::ShipTemplateSelected_Handle(BattleshipStats& Template)
+{
+	// Null safe calls
+	DestroyGhostShip();
+	DestroyPlacementConfirmPanel();
+
+	// Unchoose ship tamplate if not null
+	UnchooseShipTamplate();
+
+	// Choose new one
+	ChooseShipTamplate(&Template);
+
+	// check for gameboard cell 
+	GameBoardDrawer* const BoardDrawer = m_GameBoard_Player->GetBoardDrawer();
+	const Vector2_Int MousePos = GetMousePos();
+	const CellCoord MouseOnBoardCoord_Player = BoardDrawer->
+		GetWorldToBoardPos(Vector2(MousePos.x, MousePos.y));
+	if (m_GameBoard_Player->IsValidCoords(MouseOnBoardCoord_Player))
+	{
+		BoardCell& Cell = m_GameBoard_Player->GetCell(MouseOnBoardCoord_Player);
+		if (m_GameBoard_Player->IsAvailableForShip(
+			MouseOnBoardCoord_Player, m_ChoosenShipTamplate, &m_PlacementShipOrientation) &&
+			m_PlacementPanel->GetShipsCount(m_ChoosenShipTamplate) > 0)
+		{
+			// Remove one ship
+			m_PlacementPanel->RemoveShips(m_ChoosenShipTamplate, 1);
+
+			// Create confirm panel
+			CreateConfirmPanel(MousePos.x, MousePos.y);
+
+			// Create ghost ship (not linked to gameboard)
+			m_GhostShip = CreateShip(MouseOnBoardCoord_Player);
+			m_GhostShip->GetSpriteComponent()->SetAlphaModifier(0.5f);
+		}
+	}
+
+	RequestRedraw();
+
+	RequestRedraw();
+}
+
 void SBGame::ProcessInput()
 {
 	Game::ProcessInput();
@@ -45,7 +87,7 @@ void SBGame::ProcessInput()
 	{
 		GameBoardDrawer* BoardDrawer = m_GameBoard_Opponent->GetBoardDrawer();
 		const CellCoord MouseOnBoardCoord_Opponent = BoardDrawer->
-			GetWorldToBoardPos(m_GameBoard_Opponent, Vector2(MousePos.x, MousePos.y), 50.0f);
+			GetWorldToBoardPos(Vector2(MousePos.x, MousePos.y));
 		if (m_GameBoard_Opponent->IsValidCoords(MouseOnBoardCoord_Opponent))
 		{
 			BoardCell& Cell = m_GameBoard_Opponent->GetCell(MouseOnBoardCoord_Opponent);
@@ -59,7 +101,7 @@ void SBGame::ProcessInput()
 	{
 		GameBoardDrawer* BoardDrawer = m_GameBoard_Player->GetBoardDrawer();
 		const CellCoord MouseOnBoardCoord_Player = BoardDrawer->
-			GetWorldToBoardPos(m_GameBoard_Player, Vector2(MousePos.x, MousePos.y), 50.0f);
+			GetWorldToBoardPos(Vector2(MousePos.x, MousePos.y));
 		if (m_GameBoard_Player->IsValidCoords(MouseOnBoardCoord_Player))
 		{
 			BoardCell& Cell = m_GameBoard_Player->GetCell(MouseOnBoardCoord_Player);
@@ -70,13 +112,16 @@ void SBGame::ProcessInput()
 		}
 	}
 
+	/*
 	if (!ProvideUIWithInput_MouseOver(
 		Vector2{ (float)MousePos.x, (float)MousePos.y }))
 	{
 		// TODO: Replace with event driven
 		OnMouseOverHandle(MousePos.x, MousePos.y);
 	}
+	*/
 
+	/*
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
@@ -86,12 +131,12 @@ void SBGame::ProcessInput()
 			ExitGame();
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			if (!ProvideUIWithInput_MouseClick(
-				Vector2{ (float)MousePos.x, (float)MousePos.y }))
-			{
+			//if (!ProvideUIWithInput_MouseClick(
+			//	Vector2{ (float)MousePos.x, (float)MousePos.y }))
+			//{
 				// TODO: Replace with event driven
-				OnMouseDownHandle(MousePos.x, MousePos.y);
-			}
+			//	OnMouseDownHandle(MousePos.x, MousePos.y);
+			//}
 			break;
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym)
@@ -113,14 +158,15 @@ void SBGame::ProcessInput()
 	{
 		ExitGame();
 	}
+	*/
 }
 
 void SBGame::DrawCustom(SDL_Renderer* Renderer)
 {
 	if (m_GameBoard_Opponent)
-		m_GameBoard_Opponent->GetBoardDrawer()->DrawBoard(m_GameBoard_Opponent, Renderer, 50.0f);
+		m_GameBoard_Opponent->GetBoardDrawer()->DrawBoard(m_GameBoard_Opponent, Renderer);
 	if (m_GameBoard_Player)
-		m_GameBoard_Player->GetBoardDrawer()->DrawBoard(m_GameBoard_Player, Renderer, 50.0f);
+		m_GameBoard_Player->GetBoardDrawer()->DrawBoard(m_GameBoard_Player, Renderer);
 }
 
 void SBGame::LoadData()
@@ -154,9 +200,18 @@ void SBGame::BeginGame()
 		{ GetTexture("Assets/ships/submarine.png"), 3, 3 },
 		{ GetTexture("Assets/ships/destroyer.png"), 2, 3 }
 	};
-	m_GameBoard_Player = new GameBoard(10, 10, this, m_MainTextFont);
+	const int BoardWidth = 10;
+	const int BoardHeight = 10;
+	m_GameBoard_Player = new GameBoard(
+		BoardWidth, 
+		BoardHeight, 
+		std::unique_ptr<GameBoardDrawer>(
+			new SimpleGBD(BoardWidth, BoardHeight, m_CellSize, this, m_MainTextFont)), 
+		std::unique_ptr<GameBoardPopulator>(
+			new SimpleGBP())
+	);
 	m_GameBoard_Player->GetBoardDrawer()->SetBoardPosition(
-		Vector2{ 50.0f, 50.0f }, m_GameBoard_Player, 50.0f);
+		m_GameBoard_Player, Vector2{ m_CellSize, m_CellSize });
 	m_OpponentAI = new SeaBattleSimpleAI(m_GameBoard_Player, this);
 	StartPlacementStage(m_ShipTamplates);
 }
@@ -204,29 +259,29 @@ void SBGame::CreateGameOverPanel(PlayerEnum Winner)
 
 void SBGame::OnMouseOverHandle(const int Mouse_X, const int Mouse_Y)
 {
-	for (PlaceableBattleshipButton* ShipButton : m_ShipsButtons)
-	{
-		RectangleClickZone* const ClickZone = ShipButton->GetRectangleClickZone();
-		const bool IsMouseOver_Prev = ClickZone->GetIsMouseOver();
-		const bool IsMouseOver_New =
-			ClickZone->IsPointInsideRect(Vector2(Mouse_X, Mouse_Y));
-		// State transitions to avoid redraw each frame when mouse over
-		// Mouse over state transition: false -> true
-		if (!IsMouseOver_Prev && IsMouseOver_New)
-		{
-			ShipButton->GetSpriteComponent()->SetAlphaModifier(0.5f);
-			ClickZone->SetIsMouseOver(true);
-			RequestRedraw();
-			break;
-		}
-		// true -> false
-		else if (IsMouseOver_Prev && !IsMouseOver_New)
-		{
-			ShipButton->GetSpriteComponent()->SetAlphaModifier(1.0f);
-			ClickZone->SetIsMouseOver(false);
-			RequestRedraw();
-		}
-	}
+	//for (PlaceableBattleshipButton* ShipButton : m_ShipsButtons)
+	//{
+	//	RectangleClickZone* const ClickZone = ShipButton->GetRectangleClickZone();
+	//	const bool IsMouseOver_Prev = ClickZone->GetIsMouseOver();
+	//	const bool IsMouseOver_New =
+	//		ClickZone->IsPointInsideRect(Vector2(Mouse_X, Mouse_Y));
+	//	// State transitions to avoid redraw each frame when mouse over
+	//	// Mouse over state transition: false -> true
+	//	if (!IsMouseOver_Prev && IsMouseOver_New)
+	//	{
+	//		ShipButton->GetSpriteComponent()->SetAlphaModifier(0.5f);
+	//		ClickZone->SetIsMouseOver(true);
+	//		RequestRedraw();
+	//		break;
+	//	}
+	//	// true -> false
+	//	else if (IsMouseOver_Prev && !IsMouseOver_New)
+	//	{
+	//		ShipButton->GetSpriteComponent()->SetAlphaModifier(1.0f);
+	//		ClickZone->SetIsMouseOver(false);
+	//		RequestRedraw();
+	//	}
+	//}
 }
 
 void SBGame::OnMouseDownHandle(const int Mouse_X, const int Mouse_Y)
@@ -241,7 +296,7 @@ void SBGame::OnMouseDownHandle(const int Mouse_X, const int Mouse_Y)
 	}
 }
 
-void SBGame::StartPlacementStage(const std::vector<BattleshipStats>& Tamplates)
+void SBGame::StartPlacementStage(const std::vector<BattleshipStats>& Templates)
 {
 	if (m_GameState == GameState::Placement)
 	{
@@ -249,7 +304,7 @@ void SBGame::StartPlacementStage(const std::vector<BattleshipStats>& Tamplates)
 	}
 
 	m_GameState = GameState::Placement;
-	CreatePlacementPanel(Tamplates);
+	CreatePlacementPanel(Templates);
 }
 
 void SBGame::FinishPlacementStage()
@@ -263,44 +318,46 @@ void SBGame::FinishPlacementStage()
 	DestroyPlacementPanel();
 
 	// TODO: Replace opponents board creation to load game data
-	m_GameBoard_Opponent = CreateAndPopulateGameboard();
+	m_GameBoard_Opponent = CreateAndPopulateGameboard(10, 10);
 	m_GameBoard_Opponent->GetBoardDrawer()->SetBoardPosition(
-		Vector2{ 50.0f * 12 + 100.0f, 50.0f }, m_GameBoard_Opponent, 50.0f);
+		m_GameBoard_Opponent, Vector2{ m_CellSize * 12 + 100.0f, m_CellSize });
 	m_GameBoard_Opponent->GetBoardDrawer()->SetShipsVisability(false, m_GameBoard_Opponent);
 	m_GameBoard_Opponent->GetBoardDrawer()->SetDrawUnavailableCellsHighlight(false);
 
 	m_GameState = GameState::PlayersTurn;
 }
 
-void SBGame::CreatePlacementPanel(const std::vector<BattleshipStats>& Tamplates)
+void SBGame::CreatePlacementPanel(const std::vector<BattleshipStats>& Templates)
 {
-	constexpr float PlaceableShipsPanel_X = 50.0f * 13.5f;
-	float PlaceableShipsPanel_Y = 50.0f / 2.0f;
+	// TODO: Check if works
+	const float PlaceableShipsPanel_X = m_CellSize * 13.5f;
+	const float PlaceableShipsPanel_Y = m_CellSize / 2.0f;
+	m_PlacementPanel = new PlacementPanel(Templates, m_MainTextFont, this);
+	m_PlacementPanel->SetPosition(Vector2(PlaceableShipsPanel_X, PlaceableShipsPanel_Y));
+	
+	/*
+	float PlaceableShipsPanel_Y = m_CellSize / 2.0f;
 	for (BattleshipStats& ShipTamplate : m_ShipTamplates)
 	{
 		m_ShipsButtons.push_back(new PlaceableBattleshipButton(
 			ShipTamplate, ShipTamplate.m_ShipsBeginCount, m_MainTextFont, this));
-		PlaceableShipsPanel_Y += 50.0f;
+		PlaceableShipsPanel_Y += m_CellSize;
 		m_ShipsButtons.back()->SetPosition(
 			Vector2{ PlaceableShipsPanel_X, PlaceableShipsPanel_Y });
 		m_ShipsButtons.back()->SetRotation(Math::Pi / 2.0f);
 		const Vector2 Pos =
-			m_ShipsButtons.back()->GetPosition() + Vector2{ 150.0f, -25.0f };
+			m_ShipsButtons.back()->GetPosition() + Vector2{ 1m_CellSize, -25.0f };
 		//m_ShipsButtons.back()->GetTextComponent()->
 		//	SetTextPosition((int)Pos.x, (int)Pos.y);
 	}
+	*/
 
 	RequestRedraw();
 }
 
 void SBGame::DestroyPlacementPanel()
 {
-	for (PlaceableBattleshipButton* PlacementButton : m_ShipsButtons)
-	{
-		delete PlacementButton;
-	}
-	m_ShipsButtons.clear();
-
+	m_PlacementPanel->DestroyDeferred();
 	RequestRedraw();
 }
 
@@ -310,36 +367,22 @@ void SBGame::PlacementStageClickHandle(const int Mouse_X, const int Mouse_Y)
 	DestroyGhostShip();
 	DestroyPlacementConfirmPanel();
 
-	for (PlaceableBattleshipButton* ShipButton : m_ShipsButtons)
-	{
-		if (ShipButton->GetRectangleClickZone()->
-			IsPointInsideRect(Vector2(Mouse_X, Mouse_Y)))
-		{
-			if (!ShipButton->IsEmpty())
-			{
-				// Unchoose ship tamplate if not null
-				UnchooseShipTamplate();
-
-				// Choose new one
-				ChooseShipTamplate(ShipButton);
-			}
-			return;
-		}
-	}
-
 	if (m_ChoosenShipTamplate)
 	{
 		// check for gameboard cell 
 		GameBoardDrawer* BoardDrawer = m_GameBoard_Player->GetBoardDrawer();
 		const CellCoord MouseOnBoardCoord_Player = BoardDrawer->
-			GetWorldToBoardPos(m_GameBoard_Player, Vector2(Mouse_X, Mouse_Y), 50.0f);
+			GetWorldToBoardPos(Vector2(Mouse_X, Mouse_Y));
 		if (m_GameBoard_Player->IsValidCoords(MouseOnBoardCoord_Player))
 		{
 			BoardCell& Cell = m_GameBoard_Player->GetCell(MouseOnBoardCoord_Player);
 			if (m_GameBoard_Player->IsAvailableForShip(
-				MouseOnBoardCoord_Player, m_ChoosenShipTamplate->GetShipStats(), &m_PlacementShipOrientation) &&
-				!m_ChoosenShipTamplate->IsEmpty())
+				MouseOnBoardCoord_Player, m_ChoosenShipTamplate, &m_PlacementShipOrientation) &&
+				m_PlacementPanel->GetShipsCount(m_ChoosenShipTamplate) > 0)
 			{
+				// Remove one ship
+				m_PlacementPanel->RemoveShips(m_ChoosenShipTamplate, 1);
+
 				// Create confirm panel
 				CreateConfirmPanel(Mouse_X, Mouse_Y);
 
@@ -366,23 +409,19 @@ void SBGame::CreateConfirmPanel(const int& Mouse_X, const int& Mouse_Y)
 Battleship* SBGame::CreateShip(const CellCoord& MouseOnBoardCoord_Player)
 {
 	Battleship* Ship =
-		new Battleship(m_ChoosenShipTamplate->GetShipStats(), m_PlacementShipOrientation, MouseOnBoardCoord_Player, this);
+		new Battleship(m_ChoosenShipTamplate, m_PlacementShipOrientation, MouseOnBoardCoord_Player, this);
 	Ship->SetPosition(
-		m_GameBoard_Player->GetCorrectShipPosition(Ship, 50.0f));
+		m_GameBoard_Player->GetCorrectShipPosition(Ship, m_CellSize));
 	Ship->SetRotation(
 		m_GameBoard_Player->GetCorrectShipRotation(Ship));
 
 	return Ship;
 }
 
-void SBGame::ChooseShipTamplate(PlaceableBattleshipButton* ShipButton)
+void SBGame::ChooseShipTamplate(BattleshipStats* Template)
 {
-	m_ChoosenShipTamplate = ShipButton;
+	m_ChoosenShipTamplate = Template;
 	m_PlacementShipOrientation = ShipOrientation::Horizontal;
-
-	// Highlight selected ship button
-	m_ChoosenShipTamplate->GetSpriteComponent()->
-		SetColorModifier({ 255, 255, 0, 255 });
 	RequestRedraw();
 }
 
@@ -390,8 +429,6 @@ void SBGame::UnchooseShipTamplate()
 {
 	if (m_ChoosenShipTamplate)
 	{
-		m_ChoosenShipTamplate->GetSpriteComponent()->
-			SetColorModifier({ 255, 255, 255, 255 });
 		m_ChoosenShipTamplate = nullptr;
 		RequestRedraw();
 	}
@@ -402,7 +439,7 @@ void SBGame::GameStageClickHandle(const int Mouse_X, const int Mouse_Y)
 	// check for gameboard cell 
 	GameBoardDrawer* BoardDrawer = m_GameBoard_Opponent->GetBoardDrawer();
 	const CellCoord MouseOnBoardCoord_Opponent = BoardDrawer->
-		GetWorldToBoardPos(m_GameBoard_Opponent, Vector2(Mouse_X, Mouse_Y), 50.0f);
+		GetWorldToBoardPos(Vector2(Mouse_X, Mouse_Y));
 
 	if (m_GameBoard_Opponent &&
 		m_GameBoard_Opponent->GetBoardDrawer()->IsVisible() &&
@@ -444,9 +481,12 @@ void SBGame::GameStageClickHandle(const int Mouse_X, const int Mouse_Y)
 
 void SBGame::ShipPlacementHandle(bool Confirmed)
 {
-	if (Confirmed && m_GhostShip && m_ChoosenShipTamplate &&
-		m_ChoosenShipTamplate->DecrementShipsCount())
+	if (Confirmed && m_GhostShip && m_ChoosenShipTamplate && 
+		m_PlacementPanel->GetShipsCount(m_ChoosenShipTamplate) > 0)
 	{
+		// Remove selected ship from placement panel
+		m_PlacementPanel->RemoveShips(m_ChoosenShipTamplate, 1);
+
 		// Reset ship's sprite opacity
 		m_GhostShip->GetSpriteComponent()->SetAlphaModifier(1.0f);
 
@@ -458,18 +498,8 @@ void SBGame::ShipPlacementHandle(bool Confirmed)
 		// Reset placement state
 		m_GhostShip = nullptr;
 
-		// TODO: Extract to function
 		// Check if spare ships left to place
-		bool HasSpareShips = false;
-		for (PlaceableBattleshipButton* PlacementShip : m_ShipsButtons)
-		{
-			if (!PlacementShip->IsEmpty())
-			{
-				HasSpareShips = true;
-				break;
-			}
-		}
-		if (!HasSpareShips)
+		if (!m_PlacementPanel->AnyShipsLeft())
 		{
 			FinishPlacementStage();
 		}
@@ -507,7 +537,7 @@ void SBGame::DestroyGhostShip()
 	}
 }
 
-GameBoard* SBGame::CreateAndPopulateGameboard()
+GameBoard* SBGame::CreateAndPopulateGameboard(int BoardWidth, int BoardHeight)
 {
 	std::vector<BattleshipStats*> ShipsToSpawn;
 	for (BattleshipStats& ShipTamplate : m_ShipTamplates)
@@ -515,9 +545,16 @@ GameBoard* SBGame::CreateAndPopulateGameboard()
 		ShipsToSpawn.insert(
 			ShipsToSpawn.end(), ShipTamplate.m_ShipsBeginCount, &ShipTamplate);
 	}
-	GameBoard* ResultGB = new GameBoard(10, 10, this, m_MainTextFont);
+	GameBoard* ResultGB = new GameBoard(
+		BoardWidth,
+		BoardHeight,
+		std::unique_ptr<GameBoardDrawer>(
+			new SimpleGBD(BoardWidth, BoardHeight, m_CellSize, this, m_MainTextFont)),
+		std::unique_ptr<GameBoardPopulator>(
+			new SimpleGBP())
+	);;
 	ResultGB->GetBoardPopulator()->
-		PopulateGameBoard(ResultGB, ShipsToSpawn, this, 50.0f);
+		PopulateGameBoard(ResultGB, ShipsToSpawn, this, m_CellSize);
 
 	return ResultGB;
 }

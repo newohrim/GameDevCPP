@@ -1,18 +1,13 @@
 #pragma once
 
+#include "ui/RectProvider2D.h"
 #include "core/Math.h"
 
 struct SDL_Renderer;
 
-class UIInterface
+class UIInterface : public RectProvider2D
 {
 public:
 	virtual void DrawUI(SDL_Renderer* Renderer) = 0;
-
-	virtual bool IsPointInside(Vector2 Point) = 0;
-
-	virtual bool ConsumeInput_MouseClick(Vector2 MousePos) = 0;
-
-	virtual bool ConsumeInput_MouseOver(Vector2 MousePos) = 0;
 };
 

@@ -22,10 +22,11 @@ void UIImageComponent::DrawUI(SDL_Renderer* Renderer)
 
 	const Vector2 ParentPos = mOwner->GetPosition();
 	const SDL_Rect ImageRect = GetDrawRect();
+	const SDL_Point Pivot = GetPivot();
 	const SDL_Rect ScaledRect
 	{
-		ParentPos.x + ImageRect.x,
-		ParentPos.y + ImageRect.y,
+		ParentPos.x + ImageRect.x - Pivot.x,
+		ParentPos.y + ImageRect.y - Pivot.y,
 		ImageRect.w * GetRectScale(),
 		ImageRect.h * GetRectScale()
 	};
@@ -33,8 +34,18 @@ void UIImageComponent::DrawUI(SDL_Renderer* Renderer)
 	{
 		SDL_SetRenderDrawBlendMode(Renderer, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 	}
+	SDL_SetTextureColorMod(m_Texture, m_ColorMultiplier.r, m_ColorMultiplier.g, m_ColorMultiplier.b);
 	SDL_SetTextureAlphaMod(m_Texture, (uint8_t)(m_ImageOpacity * 255));
-	SDL_RenderCopy(Renderer, m_Texture, nullptr, &ScaledRect);
+	SDL_RenderCopyEx(
+		Renderer, 
+		m_Texture, 
+		nullptr, 
+		&ScaledRect, 
+		-Math::ToDegrees(GetRectAngle()),
+		nullptr, 
+		SDL_FLIP_NONE
+	);
 
 	SDL_SetRenderDrawBlendMode(Renderer, CachedBlendMode);
+	SDL_SetTextureColorMod(m_Texture, 255, 255, 255);
 }

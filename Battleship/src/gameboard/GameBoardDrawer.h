@@ -10,9 +10,11 @@ class SDL_Renderer;
 class GameBoardDrawer
 {
 public:
-	virtual void DrawBoard(GameBoard* Board, SDL_Renderer* Renderer, const float CellSize = 100.0f) = 0;
+	GameBoardDrawer(float CellSize);
 
-	virtual CellCoord GetWorldToBoardPos(GameBoard* Board, const Vector2 WorldPos, const float CellSize = 100.0f) const = 0;
+	virtual void DrawBoard(GameBoard* Board, SDL_Renderer* Renderer) = 0;
+
+	virtual CellCoord GetWorldToBoardPos(const Vector2 WorldPos) const = 0;
 
 	BoardCell* GetCurrMouseOverCell() const { return m_CurrMouseOverCell; }
 
@@ -22,21 +24,27 @@ public:
 
 	bool IsVisible() const { return m_IsVisible; }
 
-	virtual void SetDrawVisablity(bool IsVisible, GameBoard* Board) { m_IsVisible = IsVisible; }
+	virtual void SetDrawVisablity(GameBoard* Board, bool IsVisible) { m_IsVisible = IsVisible; }
 
-	virtual void SetShipsVisability(bool IsVisible, GameBoard* Board) = 0;
+	virtual void SetShipsVisability(GameBoard* Board, bool IsVisible) = 0;
 
 	Vector2 GetBoardPosition() const { return m_BoardPosition; }
 
-	virtual void SetBoardPosition(Vector2 Position, GameBoard* Board, const float CellSize = 100.0f) { m_BoardPosition = Position; }
+	virtual void SetBoardPosition(GameBoard* Board, Vector2 Position) { m_BoardPosition = Position; }
 
 	virtual void SetDrawUnavailableCellsHighlight(bool Value) = 0;
 
-private:
+	float GetCellSize() const { return m_CellSize; }
+
+	void SetCellSize(float CellSize) { m_CellSize = CellSize; }
+
+protected:
 	BoardCell* m_CurrMouseOverCell = nullptr;
+
+	Vector2 m_BoardPosition;
 
 	bool m_IsVisible = true;
 
-	Vector2 m_BoardPosition;
+	float m_CellSize;
 };
 

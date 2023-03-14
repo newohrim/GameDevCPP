@@ -5,7 +5,13 @@
 #include "SimpleGBD.h"
 #include "actors/Battleship.h"
 
-GameBoard::GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* GameInstance, TTF_Font* Font)
+GameBoard::GameBoard(
+	const uint8_t BoardWidth,
+	const uint8_t BoardHeight,
+	std::unique_ptr<GameBoardDrawer> GBD,
+	std::unique_ptr<GameBoardPopulator> GBP)
+	: m_BoardDrawer(std::move(GBD)),
+	  m_BoardPopulator(std::move(GBP))
 {
 	m_Grid = BoardGrid(BoardHeight, GridRow(BoardWidth));
 	for (uint8_t y = 0; y < BoardHeight; ++y) 
@@ -15,20 +21,14 @@ GameBoard::GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* 
 			m_Grid[y][x] = BoardCell({ x, y });
 		}
 	}
-
-	BoardPopulator = new SimpleGBP();
-	BoardDrawer = new SimpleGBD(this, GameInstance, Font);
 }
 
 GameBoard::~GameBoard()
 {
 	for (Battleship* Ship : m_Ships) 
 	{
-		delete Ship;
+		Ship->DestroyDeferred();
 	}
-
-	delete BoardPopulator;
-	delete BoardDrawer;
 }
 
 // TODO: Remove Pos parameter
@@ -203,4 +203,30 @@ void BoardCell::SetCellState(CellState State)
 	}
 
 	m_CellState = State;
+}
+
+bool GameBoard::IsPointInside(Vector2 Point) const
+{
+	const SDL_Point SPoint{ (int)Point.x, (int)Point.y };
+	const Vector2 BoardPos = m_BoardDrawer->GetBoardPosition();
+	const float CellSize = m_BoardDrawer->GetCellSize();
+	const SDL_Rect BoardRect =
+	{
+		BoardPos.x,
+		BoardPos.y,
+		CellSize * GetBoardWidth(),
+		CellSize * GetBoardHeight()
+	};
+
+	return SDL_PointInRect(&SPoint, &BoardRect);
+}
+
+void GameBoard::ConsumeInput_MouseOver(Vector2_Int MouseScreenCoord)
+{
+	// TODO
+}
+
+void GameBoard::ConsumeInput_MouseClick(Vector2_Int MouseScreenCoord)
+{
+	// TODO
 }

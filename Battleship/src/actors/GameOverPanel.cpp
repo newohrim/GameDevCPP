@@ -4,7 +4,7 @@
 #include "ui/UIButtonComponent.h"
 #include "ui/TextUIData.h"
 #include "components/TextUIComponent.h"
-#include "core/Game.h"
+#include "SBGame.h"
 
 GameOverPanel::GameOverPanel(TTF_Font* Font, PlayerEnum Winner, Game* GameInstance)
 	: UIContainerActor(GameInstance)
@@ -47,6 +47,6 @@ GameOverPanel::GameOverPanel(TTF_Font* Font, PlayerEnum Winner, Game* GameInstan
 
 void GameOverPanel::ResetButtonClick_Handle(UIButtonComponent* Button)
 {
-	GetGame()->ResetGame();
+	static_cast<SBGame*>(GetGame())->ResetGame();
 	DestroyDeferred();
 }

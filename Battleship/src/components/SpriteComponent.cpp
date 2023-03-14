@@ -65,3 +65,24 @@ void SpriteComponent::SetTexture(SDL_Texture* texture)
 	// Set width/height
 	SDL_QueryTexture(texture, nullptr, nullptr, &mTexWidth, &mTexHeight);
 }
+
+bool SpriteComponent::IsPointInside(Vector2 Point) const
+{
+	// TODO: Convert Point from screen to world coordinates
+
+	const Vector2 OwnerPos = mOwner->GetPosition();
+	const Vector2 RotatedPoint = Vector2::Transform(
+		Point - OwnerPos, 
+		Matrix3::CreateRotation(-mOwner->GetRotation())) + OwnerPos;
+	const SDL_Point SPoint = { RotatedPoint.x, RotatedPoint.y };
+
+	SDL_Rect SpriteRect;
+	// Scale the width/height by owner's scale
+	SpriteRect.w = static_cast<int>(mTexWidth * mOwner->GetScale());
+	SpriteRect.h = static_cast<int>(mTexHeight * mOwner->GetScale());
+	// Center the rectangle around the position of the owner
+	SpriteRect.x = static_cast<int>(mOwner->GetPosition().x - SpriteRect.w / 2);
+	SpriteRect.y = static_cast<int>(mOwner->GetPosition().y - SpriteRect.h / 2);
+
+	return SDL_PointInRect(&SPoint, &SpriteRect);
+}

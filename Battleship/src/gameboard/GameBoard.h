@@ -1,9 +1,11 @@
 #pragma once
 
+#include "ui/RectProvider2D.h"
 #include <vector>
 //#include "../Battleship.h"
 #include "core/Math.h"
 #include "SDL_ttf.h"
+#include <memory>
 
 class BoardCell;
 using GridRow = std::vector<BoardCell>;
@@ -96,10 +98,14 @@ private:
 	bool m_IsAvailableForShip = true;
 };
 
-class GameBoard
+class GameBoard : public RectProvider2D
 {
 public:
-	GameBoard(const uint8_t BoardWidth, const uint8_t BoardHeight, Game* GameInstance, TTF_Font* Font);
+	GameBoard(
+		const uint8_t BoardWidth, 
+		const uint8_t BoardHeight, 
+		std::unique_ptr<GameBoardDrawer> GBD, 
+		std::unique_ptr<GameBoardPopulator> GBP);
 
 	~GameBoard();
 
@@ -137,9 +143,9 @@ public:
 
 	float GetCorrectShipRotation(Battleship* Ship) const;
 
-	GameBoardPopulator* GetBoardPopulator() const { return BoardPopulator; }
+	GameBoardPopulator* GetBoardPopulator() const { return m_BoardPopulator.get(); }
 
-	GameBoardDrawer* GetBoardDrawer() const { return BoardDrawer; }
+	GameBoardDrawer* GetBoardDrawer() const { return m_BoardDrawer.get(); }
 
 	const std::vector<Battleship*>& GetShipsOnBoard() const { return m_Ships; }
 
@@ -153,10 +159,16 @@ public:
 
 	std::vector<CellCoord> GetCornersNeighborhood(const CellCoord Coords, int Margin = 0) const;
 
-protected:
-	GameBoardPopulator* BoardPopulator;
+	virtual bool IsPointInside(Vector2 Point) const override;
 
-	GameBoardDrawer* BoardDrawer;
+	virtual void ConsumeInput_MouseOver(Vector2_Int MouseScreenCoord) override;
+
+	virtual void ConsumeInput_MouseClick(Vector2_Int MouseScreenCoord) override;
+
+protected:
+	std::unique_ptr<GameBoardPopulator> m_BoardPopulator;
+
+	std::unique_ptr<GameBoardDrawer> m_BoardDrawer;
 
 private:
 	BoardGrid m_Grid;

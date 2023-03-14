@@ -11,37 +11,30 @@ class Game;
 class SimpleGBD : public GameBoardDrawer
 {
 public:
-	SimpleGBD(GameBoard* Board, Game* GameInstance, TTF_Font* Font);
+	SimpleGBD(int Width, int Height, float CellSize, Game* GameInstance, TTF_Font* Font);
 
-	virtual void DrawBoard(
-		GameBoard* Board, SDL_Renderer* Renderer, const float CellSize = 100.0f) override;
+	virtual void DrawBoard(GameBoard* Board, SDL_Renderer* Renderer) override;
 
-	virtual CellCoord GetWorldToBoardPos(
-		GameBoard* Board, const Vector2 WorldPos, const float CellSize = 100.0f) const override;
+	virtual CellCoord GetWorldToBoardPos(const Vector2 WorldPos) const override;
 
-	virtual void SetDrawVisablity(bool IsVisible, GameBoard* Board) override;
+	virtual void SetDrawVisablity(GameBoard* Board, bool IsVisible) override;
 
-	virtual void SetShipsVisability(bool IsVisible, GameBoard* Board) override;
+	virtual void SetShipsVisability(GameBoard* Board, bool IsVisible) override;
 
-	virtual void SetBoardPosition(Vector2 Position, GameBoard* Board, const float CellSize = 100.0f) override;
+	virtual void SetBoardPosition(GameBoard* Board, Vector2 Position) override;
 
 	virtual void SetDrawUnavailableCellsHighlight(bool Value) override { m_DrawHintCellHighlight = Value; }
 
 protected:
-	virtual void DrawGrid(
-		GameBoard* Board, SDL_Renderer* Renderer, const float CellSize = 100.0f);
+	virtual void DrawGrid(SDL_Renderer* Renderer);
 
-	virtual void DrawCells(
-		GameBoard* Board, SDL_Renderer* Renderer, const float CellSize = 100.0f);
+	virtual void DrawCells(SDL_Renderer* Renderer);
 
-	virtual void HighlightCurrentCell(
-		GameBoard* Board, SDL_Renderer* Renderer, const float CellSize = 100.0f);
+	virtual void HighlightCurrentCell(SDL_Renderer* Renderer);
 
-	virtual void DrawCellsStates(
-		GameBoard* Board, SDL_Renderer* Renderer, const float CellSize = 100.0f);
+	virtual void DrawCellsStates(GameBoard* Board, SDL_Renderer* Renderer);
 
-	virtual void DrawMarkupBorder(
-		GameBoard* Board, SDL_Renderer* Renderer, const float CellSize = 100.0f);
+	virtual void DrawMarkupBorder(SDL_Renderer* Renderer);
 
 private:
 	std::vector<SDL_Rect> Quads;
