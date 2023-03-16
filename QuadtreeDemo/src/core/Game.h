@@ -33,6 +33,8 @@ public:
 	void AddUIItem(UIInterface * UIItem);
 	void RemoveUIItem(UIInterface * UIItem);
 
+	float GetDeltaTime() const;
+
 	SDL_Point GetWindowSize() const { return m_WindowSize; }
 
 	Vector2_Int GetMousePos() const { return m_MousePos; }

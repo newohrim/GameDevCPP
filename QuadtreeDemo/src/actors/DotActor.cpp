@@ -24,11 +24,11 @@ void DotActor::UpdateActor(const float DeltaTime)
 	SetPosition(NewPos);
 
 	const SDL_Point Bounds = GetGame()->GetWindowSize();
-	if (NewPos.x < 0 || NewPos.x > Bounds.x)
+	if (NewPos.x < 0|| NewPos.x > Bounds.x)
 	{
 		m_Direction.x *= -1;
 	}
-	if (NewPos.y < 0 || NewPos.y > Bounds.y)
+	if (NewPos.y < 100 || NewPos.y > Bounds.y)
 	{
 		m_Direction.y *= -1;
 	}

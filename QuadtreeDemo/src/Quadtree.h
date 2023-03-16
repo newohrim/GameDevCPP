@@ -37,21 +37,33 @@ public:
 
 	struct QPartition 
 	{
-		QPartition(QPartition* Parent) : parent(Parent), entities(0), boundaries(0) {  }
+		QPartition(QPartition* Parent) : parent(Parent), entities(0), boundaries(0) 
+		{  
+			if (Parent) 
+			{
+				level = Parent->level + 1;
+			}
+		}
+		~QPartition();
 
 		QPartition* parent = nullptr;
 		QPartition* partitions[4];
 		std::vector<QEntity> entities;
 		std::vector<float> boundaries;
+		int size = 0;
+		int level = 0;
 		bool isLeaf = true;
 	};
 
 private:
 	static constexpr int MAX_ENTITIES_PER_PARTITION = 8;
+	static constexpr int MAX_DIVISION_LEVEL = 8;
 
 	QPartition m_Root;
 
 	QPartition* GetPartition(Vector2 Pos);
+
+	static QPartition* GetPartition(Vector2 Pos, QPartition* Partition);
 
 	void DividePartition(QPartition* Partition);
 
@@ -63,7 +75,9 @@ private:
 
 	inline void UpdateEntitiesPos(Actor* Entity, Vector2 Position, QPartition* Partition);
 
-	static bool IsChildOf(const QPartition* Child, const QPartition* Parent);
+	static void UnifyPartitionIfPossible(QPartition* Partition);
+
+	static void AddSizeToPartition(QPartition* Partition, int Increment);
 
 	static Vector2 GetMedianPoint(const QPartition* Partition);
 };

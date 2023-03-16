@@ -24,34 +24,41 @@ void Quadtree::MoveEntity(Actor* Entity, Vector2 NewPos, Vector2 OldPos)
 	}
 	
 	RemoveEntityFromPartition(Entity, OldPartition);
-	// structure could change at this point?
+
 	AddEntityToPartition(Entity, NewPos, NewPartition);
+
+	UnifyPartitionIfPossible(OldPartition->parent);
 }
 
 void Quadtree::RemoveEntity(Actor* Entity, Vector2 Position)
 {
 	QPartition* Partition = GetPartition(Position);
 	RemoveEntityFromPartition(Entity, Partition);
+	UnifyPartitionIfPossible(Partition->parent);
 }
 
 typename Quadtree::QPartition* Quadtree::GetPartition(Vector2 Pos)
 {
-	QPartition* Partition = &m_Root;
-	while (!Partition->isLeaf) 
+	return GetPartition(Pos, &m_Root);
+}
+
+Quadtree::QPartition* Quadtree::GetPartition(Vector2 Pos, QPartition* Partition)
+{
+	while (!Partition->isLeaf)
 	{
 		const Vector2 MedianPoint = GetMedianPoint(Partition);
-		if (Pos.y <= MedianPoint.y) 
+		if (Pos.y <= MedianPoint.y)
 		{
-			if (Pos.x <= MedianPoint.x) 
+			if (Pos.x <= MedianPoint.x)
 			{
 				Partition = Partition->partitions[0];
 			}
-			else 
+			else
 			{
 				Partition = Partition->partitions[1];
 			}
 		}
-		else 
+		else
 		{
 			if (Pos.x <= MedianPoint.x)
 			{
@@ -111,6 +118,17 @@ void Quadtree::DividePartition(QPartition* Partition)
 	{
 		PopulateChildPartition(Partition->partitions[i], Partition);
 	}
+	// Might fix out of bounds
+	if (!Partition->entities.empty()) 
+	{
+		for (int i = 0; i < Partition->entities.size(); ++i) 
+		{
+			GetPartition(Partition->entities[i].pos, Partition)->
+				entities.push_back(Partition->entities[i]);
+		}
+		Partition->entities.clear();
+	}
+	assert(Partition->entities.empty());
 
 	Partition->entities.shrink_to_fit();
 }
@@ -127,6 +145,7 @@ void Quadtree::PopulateChildPartition(QPartition* Child, QPartition* Partition)
 			entity.pos.y <= Child->boundaries[3]) 
 		{
 			Child->entities.push_back(entity);
+			Child->size++;
 			Partition->entities.erase(Partition->entities.begin() + i);
 		}
 	}
@@ -135,7 +154,8 @@ void Quadtree::PopulateChildPartition(QPartition* Child, QPartition* Partition)
 void Quadtree::AddEntityToPartition(Actor* Entity, Vector2 Position, QPartition* Partition)
 {
 	Partition->entities.push_back(QEntity{ Position, Entity });
-	if (Partition->entities.size() > MAX_ENTITIES_PER_PARTITION)
+	AddSizeToPartition(Partition, 1);
+	if (Partition->entities.size() > MAX_ENTITIES_PER_PARTITION && Partition->level <= MAX_DIVISION_LEVEL)
 	{
 		DividePartition(Partition);
 	}
@@ -146,28 +166,47 @@ void Quadtree::RemoveEntityFromPartition(Actor* Entity, QPartition* Partition)
 	auto Iter = std::find(Partition->entities.begin(), Partition->entities.end(), Entity);
 	assert(Iter != Partition->entities.end());
 	Partition->entities.erase(Iter);
-
-	// TODO: Add levels simplification
+	AddSizeToPartition(Partition, -1);
 }
 
 void Quadtree::UpdateEntitiesPos(Actor* Entity, Vector2 Position, QPartition* Partition)
 {
 	auto Iter = std::find(Partition->entities.begin(), Partition->entities.end(), Entity);
-	assert(Iter != Partition->entities.end());
+	if (Iter == Partition->entities.end())
+		assert(Iter != Partition->entities.end());
 	Iter->pos = Position;
 }
 
-bool Quadtree::IsChildOf(const QPartition* Child, const QPartition* Parent)
+void Quadtree::UnifyPartitionIfPossible(QPartition* Partition)
 {
-	for (int i = 0; i < 4; ++i) 
+	if (Partition && Partition->isLeaf) 
 	{
-		if (Parent->partitions[i] == Child) 
-		{
-			return true;
-		}
+		return;
 	}
+	while (Partition && Partition->size <= MAX_ENTITIES_PER_PARTITION) 
+	{
+		Partition->entities.reserve(Partition->size);
+		for (int i = 0; i < 4; ++i) 
+		{
+			Partition->entities.insert(
+				Partition->entities.end(), 
+				Partition->partitions[i]->entities.begin(), 
+				Partition->partitions[i]->entities.end());
+			delete Partition->partitions[i];
+		}
 
-	return false;
+		Partition->isLeaf = true;
+		Partition = Partition->parent;
+	}
+}
+
+void Quadtree::AddSizeToPartition(QPartition* Partition, int Increment)
+{
+	while (Partition) 
+	{
+		Partition->size += Increment;
+		Partition = Partition->parent;
+	}
 }
 
 Vector2 Quadtree::GetMedianPoint(const QPartition* Partition)
@@ -177,4 +216,16 @@ Vector2 Quadtree::GetMedianPoint(const QPartition* Partition)
 	MedianPoint.y = (Partition->boundaries[3] + Partition->boundaries[2]) / 2.0f;
 
 	return MedianPoint;
+}
+
+Quadtree::QPartition::~QPartition()
+{
+	if (isLeaf) 
+	{
+		return;
+	}
+	for (int i = 0; i < 4; ++i) 
+	{
+		delete partitions[i];
+	}
 }

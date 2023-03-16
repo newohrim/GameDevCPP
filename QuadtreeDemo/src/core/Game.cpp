@@ -156,6 +156,11 @@ void Game::RemoveUIItem(UIInterface * UIItem)
 	}
 }
 
+float Game::GetDeltaTime() const
+{
+	return (SDL_GetTicks() - mTicksCount) / 1000.0f;
+}
+
 SDL_Texture* Game::GetTexture(const std::string& fileName)
 {
 	SDL_Texture* tex = nullptr;
@@ -201,7 +206,7 @@ void Game::ProcessInput()
 
 void Game::UpdateGame() 
 {
-	while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16));
+	//while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16));
 
 	float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
 	if (deltaTime > 0.05f)

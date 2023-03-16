@@ -4,12 +4,24 @@
 #include "components/DotRenderComponent.h"
 #include "core/Random.h"
 
+#include "ui/UIContainerActor.h"
+#include "components/TextUIComponent.h"
+
 void QuadtreeDemo::LoadData()
 {
 	const SDL_Point WindowSize = GetWindowSize();
 	m_DotsTree = Quadtree({ 0, (float)WindowSize.x, 0, (float)WindowSize.y });
 	m_Dots = InitializeDots(m_DotsCount, GetWindowSize());
 	m_QuadtreeDrawer = std::unique_ptr<QuadtreeDrawer>(new QuadtreeDrawer());
+
+	m_MainTextFont = TTF_OpenFont("Assets/arialmt.ttf", 24);
+	if (!m_MainTextFont)
+	{
+		SDL_Log(TTF_GetError());
+	}
+	m_StatusLabelContainer = new UIContainerActor(this);
+	m_StatusLabel = new TextUIComponent(m_MainTextFont, m_StatusLabelContainer);
+	m_StatusLabelContainer->AddUIComponent(m_StatusLabel);
 }
 
 void QuadtreeDemo::ProcessInput()
@@ -26,7 +38,13 @@ void QuadtreeDemo::ProcessInput()
 				break;
 		}
 	}
+}
 
+void QuadtreeDemo::UpdateGame()
+{
+	Game::UpdateGame();
+
+	m_StatusLabel->SetText(std::to_string(GetDeltaTime() * 1000.0f));
 	RequestRedraw();
 }
 
@@ -46,7 +64,7 @@ std::vector<DotActor*> QuadtreeDemo::InitializeDots(size_t Count, SDL_Point Boun
 	for (int i = 0; i < Count; ++i) 
 	{
 		Dots[i] = new DotActor(&m_DotsTree, this);
-		Dots[i]->SetPosition(GetRandomPosition(Bounds));
+		Dots[i]->SetPosition(GetRandomPosition(Bounds) * 0.5 + Vector2 { 100, 100 });
 		m_DotsTree.AddEntity(Dots[i], Dots[i]->GetPosition());
 	}
 
