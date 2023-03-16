@@ -26,6 +26,8 @@ void QuadtreeDemo::ProcessInput()
 				break;
 		}
 	}
+
+	RequestRedraw();
 }
 
 void QuadtreeDemo::DrawCustom(SDL_Renderer* Renderer)
@@ -43,7 +45,7 @@ std::vector<DotActor*> QuadtreeDemo::InitializeDots(size_t Count, SDL_Point Boun
 	std::vector<DotActor*> Dots(Count);
 	for (int i = 0; i < Count; ++i) 
 	{
-		Dots[i] = new DotActor(this);
+		Dots[i] = new DotActor(&m_DotsTree, this);
 		Dots[i]->SetPosition(GetRandomPosition(Bounds));
 		m_DotsTree.AddEntity(Dots[i], Dots[i]->GetPosition());
 	}
