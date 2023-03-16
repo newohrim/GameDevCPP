@@ -6,7 +6,10 @@
 
 void QuadtreeDemo::LoadData()
 {
+	const SDL_Point WindowSize = GetWindowSize();
+	m_DotsTree = Quadtree({ 0, (float)WindowSize.x, 0, (float)WindowSize.y });
 	m_Dots = InitializeDots(m_DotsCount, GetWindowSize());
+	m_QuadtreeDrawer = std::unique_ptr<QuadtreeDrawer>(new QuadtreeDrawer());
 }
 
 void QuadtreeDemo::ProcessInput()
@@ -27,6 +30,8 @@ void QuadtreeDemo::ProcessInput()
 
 void QuadtreeDemo::DrawCustom(SDL_Renderer* Renderer)
 {
+	m_QuadtreeDrawer->DrawGrid(m_DotsTree, Renderer);
+
 	for (DotActor* Dot : m_Dots) 
 	{
 		Dot->GetDotRenderComponent()->DrawDot(Renderer);

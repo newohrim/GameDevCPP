@@ -158,6 +158,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\QuadtreeDrawer.cpp" />
     <ClCompile Include="src\actors\DotActor.cpp" />
     <ClCompile Include="src\components\DotRenderComponent.cpp" />
     <ClCompile Include="src\components\RectangleClickZone.cpp" />
@@ -179,6 +180,7 @@
     <ClCompile Include="src\ui\UIPanelComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\QuadtreeDrawer.h" />
     <ClInclude Include="src\actors\DotActor.h" />
     <ClInclude Include="src\components\DotRenderComponent.h" />
     <ClInclude Include="src\components\RectangleClickZone.h" />

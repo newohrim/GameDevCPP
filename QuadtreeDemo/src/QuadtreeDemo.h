@@ -2,6 +2,8 @@
 
 #include "core/Game.h"
 #include "Quadtree.h"
+#include <memory>
+#include "QuadtreeDrawer.h"
 
 class DotActor;
 
@@ -21,7 +23,8 @@ public:
 private:
 	static const size_t m_DotsCount = 100;
 	std::vector<DotActor*> m_Dots;
-	Quadtree<DotActor*> m_DotsTree;
+	Quadtree m_DotsTree;
+	std::unique_ptr<QuadtreeDrawer> m_QuadtreeDrawer;
 
 	std::vector<DotActor*> InitializeDots(size_t Count, SDL_Point Bounds);
 

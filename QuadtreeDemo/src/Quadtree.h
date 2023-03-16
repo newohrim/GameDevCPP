@@ -3,46 +3,45 @@
 #include "core/Math.h"
 #include <vector>
 
-template<class T>
+class Actor;
+
 class Quadtree
 {
+
 public:
+	friend class QuadtreeDrawer;
+
 	Quadtree(const std::vector<float>& boundaries);
 
-	void AddEntity(T Entity, Vector2 Position);
+	void AddEntity(Actor* Entity, Vector2 Position);
 
 public:
-	struct QEntity;
+	struct QEntity 
+	{
+		Vector2 pos;
+		Actor* target;
+	};
 
-	struct QPartition;
+	struct QPartition 
+	{
+		QPartition() : entities(0), boundaries(0) {  }
+
+		QPartition* partitions[4];
+		std::vector<QEntity> entities;
+		std::vector<float> boundaries;
+		bool isLeaf = true;
+	};
 
 private:
-	QPartition m_Root;
 	static constexpr int MAX_ENTITIES_PER_PARTITION = 8;
 
-	typename Quadtree<T>::QPartition* GetPartition(Vector2 Pos) const;
+	QPartition m_Root;
+
+	QPartition* GetPartition(Vector2 Pos);
 
 	void DividePartition(QPartition* Partition);
 
 	void PopulateChildPartition(QPartition* Child, QPartition* Parent);
 
-	Vector2 GetMedianPoint(QPartition* Partition) const;
-};
-
-template<class T>
-struct Quadtree<T>::QEntity
-{
-	Vector2 pos;
-	T target;
-};
-
-template<class T>
-struct Quadtree<T>::QPartition
-{
-	QPartition() : entities(0), boundaries(0) {  }
-
-	QPartition* partitions[4];
-	std::vector<QEntity> entities;
-	std::vector<float> boundaries;
-	bool isLeaf = true;
+	static Vector2 GetMedianPoint(const QPartition* Partition);
 };
