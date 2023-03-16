@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Runner2D", "Runner2D\Runner
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Battleship", "Battleship\Battleship.vcxproj", "{39B44EF9-5B06-47FC-A8C2-AA763C7F4026}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuadtreeDemo", "QuadtreeDemo\QuadtreeDemo.vcxproj", "{ADEECF4D-E817-45B4-8320-36C4325B1513}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -71,6 +73,14 @@ Global
 		{39B44EF9-5B06-47FC-A8C2-AA763C7F4026}.Release|x64.Build.0 = Release|x64
 		{39B44EF9-5B06-47FC-A8C2-AA763C7F4026}.Release|x86.ActiveCfg = Release|Win32
 		{39B44EF9-5B06-47FC-A8C2-AA763C7F4026}.Release|x86.Build.0 = Release|Win32
+		{ADEECF4D-E817-45B4-8320-36C4325B1513}.Debug|x64.ActiveCfg = Debug|x64
+		{ADEECF4D-E817-45B4-8320-36C4325B1513}.Debug|x64.Build.0 = Debug|x64
+		{ADEECF4D-E817-45B4-8320-36C4325B1513}.Debug|x86.ActiveCfg = Debug|Win32
+		{ADEECF4D-E817-45B4-8320-36C4325B1513}.Debug|x86.Build.0 = Debug|Win32
+		{ADEECF4D-E817-45B4-8320-36C4325B1513}.Release|x64.ActiveCfg = Release|x64
+		{ADEECF4D-E817-45B4-8320-36C4325B1513}.Release|x64.Build.0 = Release|x64
+		{ADEECF4D-E817-45B4-8320-36C4325B1513}.Release|x86.ActiveCfg = Release|Win32
+		{ADEECF4D-E817-45B4-8320-36C4325B1513}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
