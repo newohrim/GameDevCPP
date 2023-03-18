@@ -19,6 +19,8 @@ public:
 
 	void RemoveEntity(Actor* Entity, Vector2 Position);
 
+	std::vector<Actor*> GetEntitiesInRadius(Vector2 Position, float Radius);
+
 public:
 	struct QEntity 
 	{
@@ -78,6 +80,10 @@ private:
 	static void UnifyPartitionIfPossible(QPartition* Partition);
 
 	static void AddSizeToPartition(QPartition* Partition, int Increment);
+
+	static float GetSqDistanceToPartition(QPartition* Partition, Vector2 Point);
+
+	static void PartitionsBypass(QPartition* Partition, Vector2 Point, float SqRadius, std::vector<Actor*>& Out);
 
 	static Vector2 GetMedianPoint(const QPartition* Partition);
 };

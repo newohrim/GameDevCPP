@@ -20,8 +20,11 @@ void QuadtreeDemo::LoadData()
 		SDL_Log(TTF_GetError());
 	}
 	m_StatusLabelContainer = new UIContainerActor(this);
-	m_StatusLabel = new TextUIComponent(m_MainTextFont, m_StatusLabelContainer);
-	m_StatusLabelContainer->AddUIComponent(m_StatusLabel);
+	m_MsLabel = new TextUIComponent(m_MainTextFont, m_StatusLabelContainer);
+	m_StatusLabelContainer->AddUIComponent(m_MsLabel);
+	m_CountLabel = new TextUIComponent(m_MainTextFont, m_StatusLabelContainer);
+	m_CountLabel->SetRectPosition(0, 32);
+	m_StatusLabelContainer->AddUIComponent(m_CountLabel);
 }
 
 void QuadtreeDemo::ProcessInput()
@@ -44,7 +47,31 @@ void QuadtreeDemo::UpdateGame()
 {
 	Game::UpdateGame();
 
-	m_StatusLabel->SetText(std::to_string(GetDeltaTime() * 1000.0f));
+	const Vector2_Int MousePos = GetMousePos();
+	const Vector2 FMousePos = Vector2{ (float)MousePos.x, (float)MousePos.y };
+	const std::vector<Actor*> DotsInRadius = 
+		m_DotsTree.GetEntitiesInRadius(FMousePos, 25.0f);
+	for (Actor* Dot : DotsInRadius) 
+	{
+		DotActor* const DotA = static_cast<DotActor*>(Dot);
+		DotA->GetDotRenderComponent()->SetDotColor({ 255, 255, 0, 255 });
+		DotA->SetMoveDirection(Vector2::Normalize(DotA->GetPosition() - FMousePos));
+
+		if (DotA->GetReproduceCooldown() <= 0.0f)
+		{
+			DotA->SetReproduceCooldown(REPRODUCE_COOLDOWN);
+			DotActor* const NewDot = new DotActor(&m_DotsTree, this);
+			NewDot->SetPosition(DotA->GetPosition() + Vector2 { 1.0f, 1.0f });
+			NewDot->GetDotRenderComponent()->SetDotColor({ 255, 255, 0, 255 });
+			NewDot->SetReproduceCooldown(REPRODUCE_COOLDOWN);
+			m_Dots.push_back(NewDot);
+			m_DotsTree.AddEntity(NewDot, NewDot->GetPosition());
+		}
+	}
+
+	m_MsLabel->SetText(std::to_string(GetDeltaTime() * 1000.0f));
+	m_CountLabel->SetText(std::to_string(m_Dots.size()));
+
 	RequestRedraw();
 }
 
@@ -55,7 +82,10 @@ void QuadtreeDemo::DrawCustom(SDL_Renderer* Renderer)
 	for (DotActor* Dot : m_Dots) 
 	{
 		Dot->GetDotRenderComponent()->DrawDot(Renderer);
+		Dot->GetDotRenderComponent()->SetDotColor({255, 255, 255, 255});
 	}
+
+	const Vector2_Int MousePos = GetMousePos();
 }
 
 std::vector<DotActor*> QuadtreeDemo::InitializeDots(size_t Count, SDL_Point Bounds)

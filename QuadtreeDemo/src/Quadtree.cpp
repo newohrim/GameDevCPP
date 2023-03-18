@@ -37,6 +37,14 @@ void Quadtree::RemoveEntity(Actor* Entity, Vector2 Position)
 	UnifyPartitionIfPossible(Partition->parent);
 }
 
+std::vector<Actor*> Quadtree::GetEntitiesInRadius(Vector2 Position, float Radius)
+{
+	std::vector<Actor*> Result;
+	PartitionsBypass(&m_Root, Position, Radius * Radius, Result);
+
+	return Result;
+}
+
 typename Quadtree::QPartition* Quadtree::GetPartition(Vector2 Pos)
 {
 	return GetPartition(Pos, &m_Root);
@@ -206,6 +214,43 @@ void Quadtree::AddSizeToPartition(QPartition* Partition, int Increment)
 	{
 		Partition->size += Increment;
 		Partition = Partition->parent;
+	}
+}
+
+float Quadtree::GetSqDistanceToPartition(QPartition* Partition, Vector2 Point)
+{
+	// Source: https://stackoverflow.com/questions/5254838/calculating-distance-between-a-point-and-a-rectangular-box-nearest-point
+
+	const Vector2 MinCorner{ Partition->boundaries[0], Partition->boundaries[2] };
+	const Vector2 MaxCorner{ Partition->boundaries[1], Partition->boundaries[3] };
+	const float dx = Math::Max(0.0f, 
+		Math::Max(MinCorner.x - Point.x, Point.x - MaxCorner.x));
+	const float dy = Math::Max(0.0f,
+		Math::Max(MinCorner.y - Point.y, Point.y - MaxCorner.y));
+
+	return dx * dx + dy * dy;
+}
+
+void Quadtree::PartitionsBypass(QPartition* Partition, Vector2 Point, float SqRadius, std::vector<Actor*>& Out)
+{
+	if (Partition->isLeaf) 
+	{
+		for (const QEntity& Entity : Partition->entities) 
+		{
+			if ((Entity.pos - Point).LengthSq() <= SqRadius)
+			{
+				Out.push_back(Entity.target);
+			}
+		}
+		return;
+	}
+	for (int i = 0; i < 4; ++i) 
+	{
+		if (Partition->partitions[i]->size > 0 &&
+			GetSqDistanceToPartition(Partition->partitions[i], Point) <= SqRadius) 
+		{
+			PartitionsBypass(Partition->partitions[i], Point, SqRadius, Out);
+		}
 	}
 }
 

@@ -32,4 +32,6 @@ void DotActor::UpdateActor(const float DeltaTime)
 	{
 		m_Direction.y *= -1;
 	}
+
+	m_ReproduceCooldown = Math::Max(0.0f, m_ReproduceCooldown - DeltaTime);
 }
